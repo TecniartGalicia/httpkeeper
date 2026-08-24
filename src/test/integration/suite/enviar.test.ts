@@ -2,7 +2,9 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 
 const PUERTO = process.env.RC_TEST_PUERTO!;
-const BASE = `http://127.0.0.1:${PUERTO}`;
+const BASE = `http://[::1]:${PUERTO}`;
+/** El mismo servidor por nombre: así se ejercita la resolución de localhost. */
+const BASE_LOCALHOST = `http://localhost:${PUERTO}`;
 const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const BR = String.fromCharCode(10);
 
@@ -140,6 +142,22 @@ describe('HttpKeeper · peticiones reales', () => {
         await ajuste('defaultHeaders', undefined);
       }
     });
+  });
+});
+
+describe('HttpKeeper · resolución de localhost', () => {
+  before(async () => {
+    const ext = vscode.extensions.getExtension('argalla.httpkeeper');
+    await ext!.activate();
+    await ajuste('previewResponseInUntitledDocument', true);
+  });
+
+  // PR #1396: el servidor de pruebas escucha SOLO en IPv6. Sin el parche,
+  // `localhost` se resolvía a 127.0.0.1 y la petición no llegaba.
+  it('P-27 · localhost alcanza un servidor que solo escucha en IPv6', async () => {
+    const t = await enviar(`GET ${BASE_LOCALHOST}/por-nombre` + BR, '/por-nombre');
+    assert.ok(t.includes('HTTP/1.1 200'), `no llegó por localhost:
+${t.slice(0, 200)}`);
   });
 });
 

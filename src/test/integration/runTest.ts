@@ -27,7 +27,7 @@ const s=http.createServer((q,r)=>{
     r.writeHead(200,{'content-type':'application/json'});r.end(eco());
   });
 });
-s.listen(0,'127.0.0.1',()=>console.log(JSON.stringify({puerto:s.address().port})));`,
+s.listen(0,'::1',()=>console.log(JSON.stringify({puerto:s.address().port})));`,
   );
   const hijo = cp.spawn(process.execPath, [servidor], { stdio: ['ignore', 'pipe', 'inherit'] });
   const puerto: string = await new Promise((res, rej) => {
