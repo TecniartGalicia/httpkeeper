@@ -1,14 +1,9 @@
-import { Telemetry } from './telemetry';
-
-export function trace(eventName: string): MethodDecorator {
-    return (target, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
-        const originalMethod = descriptor.value;
-
-        descriptor.value = function(...args: any[]) {
-            Telemetry.sendEvent(eventName);
-            return originalMethod.apply(this, args);
-        };
-
-        return descriptor;
-    };
+/**
+ * Marca métodos que antes enviaban telemetría.
+ *
+ * HttpKeeper no envía nada a ninguna parte: el decorador se conserva vacío para
+ * no tocar diez controladores y para que quede constancia de dónde estaba.
+ */
+export function trace(_eventName: string): MethodDecorator {
+    return (_target, _propertyKey: string | symbol, descriptor: PropertyDescriptor) => descriptor;
 }

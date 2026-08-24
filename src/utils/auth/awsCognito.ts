@@ -1,53 +1,72 @@
-import { Amplify, Auth } from "aws-amplify";
-import type { BeforeRequestHook } from "got";
+import got from 'got';
+import type { BeforeRequestHook } from 'got';
+
+/**
+ * Autenticación con AWS Cognito.
+ *
+ * La implementación original importaba `aws-amplify` entero —GraphQL, DataStore,
+ * predicciones de aprendizaje automático, pubsub, notificaciones— para hacer un
+ * inicio de sesión: 17 MB en disco y 41 paquetes con vulnerabilidades conocidas.
+ *
+ * Cognito es una API HTTP normal, así que aquí se llama directamente. Mismo
+ * comportamiento, misma sintaxis en el fichero `.http`, sin el SDK.
+ */
+
+const OBJETIVO = 'AWSCognitoIdentityProviderService.InitiateAuth';
+
+interface RespuestaCognito {
+  AuthenticationResult?: {
+    AccessToken?: string;
+    IdToken?: string;
+  };
+  ChallengeName?: string;
+  message?: string;
+  __type?: string;
+}
 
 async function login(
   username: string,
   password: string,
   region: string,
-  userPoolId: string,
-  clientId: string
-): Promise<{
-  authId: string;
-  idToken: string;
-  accessToken: string;
-}> {
-  Amplify.configure({
-    Auth: {
-      region,
-      userPoolId,
-      userPoolWebClientId: clientId,
-    },
-  });
-
-  const user = await Auth.signIn(username, password);
-  const authId = user?.username;
-  const idToken = user?.signInUserSession?.idToken?.jwtToken;
-  const accessToken = user?.signInUserSession?.accessToken?.jwtToken;
-
-  if (!idToken || !accessToken) {
-    throw Error(`Invalid auth response: ${JSON.stringify(user, null, 2)}`);
+  _userPoolId: string,
+  clientId: string,
+): Promise<{ idToken: string; accessToken: string }> {
+  let cuerpo: RespuestaCognito;
+  try {
+    cuerpo = await got
+      .post(`https://cognito-idp.${region}.amazonaws.com/`, {
+        headers: {
+          'content-type': 'application/x-amz-json-1.1',
+          'x-amz-target': OBJETIVO,
+        },
+        json: {
+          AuthFlow: 'USER_PASSWORD_AUTH',
+          ClientId: clientId,
+          AuthParameters: { USERNAME: username, PASSWORD: password },
+        },
+        responseType: 'json',
+        throwHttpErrors: false,
+      })
+      .json<RespuestaCognito>();
+  } catch (e) {
+    throw new Error(`Cognito no respondió: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  return {
-    authId,
-    idToken,
-    accessToken,
-  };
+  const r = cuerpo.AuthenticationResult;
+  if (!r?.AccessToken || !r?.IdToken) {
+    // Un desafío pendiente (cambio de contraseña, MFA) no se puede resolver aquí.
+    const motivo = cuerpo.ChallengeName
+      ? `Cognito pide resolver "${cuerpo.ChallengeName}" antes de dar un token`
+      : cuerpo.message || cuerpo.__type || 'respuesta sin tokens';
+    throw new Error(`Invalid auth response: ${motivo}`);
+  }
+  return { idToken: r.IdToken, accessToken: r.AccessToken };
 }
 
-export async function awsCognito(
-  authorization: string
-): Promise<BeforeRequestHook> {
+export async function awsCognito(authorization: string): Promise<BeforeRequestHook> {
   const [, username, password, region, userPoolId, clientId] = authorization.split(/\s+/);
 
-  const { accessToken } = await login(
-    username,
-    password,
-    region,
-    userPoolId,
-    clientId
-  );
+  const { accessToken } = await login(username, password, region, userPoolId, clientId);
 
   return async (options) => {
     options.headers = {
