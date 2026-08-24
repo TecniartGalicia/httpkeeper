@@ -5,20 +5,23 @@
     "lib": [
       "ES2022"
     ],
-    "outDir": "out-test",
+    "outDir": "dist-cli",
     "rootDir": "src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
     "types": [
-      "node",
-      "vscode",
-      "mocha"
-    ]
+      "node"
+    ],
+    "experimentalDecorators": true
   },
   "include": [
-    "src/test/**/*.ts",
+    "src/cli/**/*.ts",
     "src/core/**/*.ts"
+  ],
+  "exclude": [
+    "src/test/**/*"
   ]
 }

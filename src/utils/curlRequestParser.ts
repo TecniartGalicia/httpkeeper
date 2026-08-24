@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import { RequestHeaders } from '../models/base';
-import { IRestClientSettings } from '../models/configurationSettings';
+import type { IRestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { base64, hasHeader } from './misc';

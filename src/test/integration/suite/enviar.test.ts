@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 const PUERTO = process.env.RC_TEST_PUERTO!;
 const BASE = `http://127.0.0.1:${PUERTO}`;
 const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const BR = String.fromCharCode(10);
 
 /**
  * Abre un .http en el editor, ejecuta Send Request y devuelve la respuesta.
@@ -15,7 +16,7 @@ const esperar = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function enviar(contenido: string, marca: string, segundos = 20): Promise<string> {
   const doc = await vscode.workspace.openTextDocument({ language: 'http', content: contenido });
   await vscode.window.showTextDocument(doc, { preview: false });
-  await vscode.commands.executeCommand('rest-client.request');
+  await vscode.commands.executeCommand('httpkeeper.request');
 
   for (let i = 0; i < segundos * 4; i++) {
     await esperar(250);
@@ -29,11 +30,11 @@ async function enviar(contenido: string, marca: string, segundos = 20): Promise<
 }
 
 const ajuste = (clave: string, valor: unknown) =>
-  vscode.workspace.getConfiguration('rest-client').update(clave, valor, vscode.ConfigurationTarget.Global);
+  vscode.workspace.getConfiguration('httpkeeper').update(clave, valor, vscode.ConfigurationTarget.Global);
 
 describe('HttpKeeper · peticiones reales', () => {
   before(async () => {
-    const ext = vscode.extensions.getExtension('humao.rest-client');
+    const ext = vscode.extensions.getExtension('argalla.httpkeeper');
     assert.ok(ext, 'la extensión no está cargada');
     await ext!.activate();
     await ajuste('previewResponseInUntitledDocument', true);
@@ -112,11 +113,29 @@ describe('HttpKeeper · peticiones reales', () => {
   });
 
   describe('compatibilidad', () => {
-    it('P-10 · respeta un ajuste heredado de rest-client', async () => {
-      await ajuste('defaultHeaders', { 'X-Heredado': 'si', 'User-Agent': 'httpkeeper-test' });
+    it('P-10 · un ajuste propio se aplica', async () => {
+      await ajuste('defaultHeaders', { 'User-Agent': 'httpkeeper-propio' });
       try {
-        const t = await enviar(`GET ${BASE}/cabeceras\n`, 'httpkeeper-test');
-        assert.ok(t.includes('httpkeeper-test'), 'no se aplicó la cabecera por defecto');
+        const t = await enviar(`GET ${BASE}/cabeceras` + BR, 'httpkeeper-propio');
+        assert.ok(t.includes('httpkeeper-propio'), 'no se aplicó la cabecera por defecto');
+      } finally {
+        await ajuste('defaultHeaders', undefined);
+      }
+    });
+
+    // El settings.json de la suite trae "rest-client.defaultHeaders" puesto,
+    // como el de cualquiera que venga de REST Client.
+    it('P-16 · sin ajuste propio se hereda el de REST Client', async () => {
+      const t = await enviar(`GET ${BASE}/cabeceras` + BR, 'viene-de-restclient');
+      assert.ok(t.includes('viene-de-restclient'), 'no se heredó la configuración de REST Client');
+    });
+
+    it('P-16 · el ajuste propio gana al heredado', async () => {
+      await ajuste('defaultHeaders', { 'User-Agent': 'el-nuevo' });
+      try {
+        const t = await enviar(`GET ${BASE}/cabeceras` + BR, 'el-nuevo');
+        assert.ok(t.includes('el-nuevo'), 'debe mandar el ajuste propio');
+        assert.ok(!t.includes('viene-de-restclient'), 'el heredado no debe colarse');
       } finally {
         await ajuste('defaultHeaders', undefined);
       }
@@ -126,7 +145,7 @@ describe('HttpKeeper · peticiones reales', () => {
 
 describe('HttpKeeper · variables de petición', () => {
   before(async () => {
-    const ext = vscode.extensions.getExtension('humao.rest-client');
+    const ext = vscode.extensions.getExtension('argalla.httpkeeper');
     await ext!.activate();
     await ajuste('previewResponseInUntitledDocument', true);
     // Si la respuesta se lleva el foco, la siguiente petición se ejecutaría
@@ -152,7 +171,7 @@ describe('HttpKeeper · variables de petición', () => {
     // Primera petición: el cursor sobre su línea de URL.
     const primera = lineaDe('@name');
     editor.selection = new vscode.Selection(primera + 1, 0, primera + 1, 0);
-    await vscode.commands.executeCommand('rest-client.request');
+    await vscode.commands.executeCommand('httpkeeper.request');
 
     // Se espera a la respuesta CONCRETA de esta primera petición: el documento
     // de respuesta se reutiliza y podría haber un 200 de una prueba anterior.
@@ -170,7 +189,7 @@ describe('HttpKeeper · variables de petición', () => {
     await vscode.window.showTextDocument(doc, { preview: false });
     const segunda = lineaDe('{{');
     editor.selection = new vscode.Selection(segunda, 0, segunda, 0);
-    await vscode.commands.executeCommand('rest-client.request');
+    await vscode.commands.executeCommand('httpkeeper.request');
 
     for (let i = 0; i < 80; i++) {
       await esperar(250);
@@ -188,24 +207,24 @@ describe('HttpKeeper · variables de petición', () => {
 
   it('P-12 · JSONPath extrae un valor de la respuesta anterior', async () => {
     const t = await encadenar(
-      `# @name primera\nGET ${BASE}/json\n\n###\n\n# segunda\nGET ${BASE}/eco?v={{primera.response.body.$.anidado.a}}\n`,
-      '/eco',
+      `# @name primera\nGET ${BASE}/json\n\n###\n\n# segunda\nGET ${BASE}/eco-json?v={{primera.response.body.$.anidado.a}}\n`,
+      '/eco-json',
     );
-    assert.ok(t.includes('/eco?v=1'), `el JSONPath no se resolvió:\n${t.slice(0, 250)}`);
+    assert.ok(t.includes('/eco-json?v=1'), `el JSONPath no se resolvió:\n${t.slice(0, 250)}`);
   });
 
   it('P-13 · XPath extrae un valor de una respuesta XML', async () => {
     const t = await encadenar(
-      `# @name uno\nGET ${BASE}/xml\n\n###\n\n# segunda\nGET ${BASE}/eco?v={{uno.response.body.//hijo/text()}}\n`,
-      '/eco',
+      `# @name uno\nGET ${BASE}/xml\n\n###\n\n# segunda\nGET ${BASE}/eco-xml?v={{uno.response.body.//hijo/text()}}\n`,
+      '/eco-xml',
     );
-    assert.ok(t.includes('/eco?v=valor'), `el XPath no se resolvió:\n${t.slice(0, 250)}`);
+    assert.ok(t.includes('/eco-xml?v=valor'), `el XPath no se resolvió:\n${t.slice(0, 250)}`);
   });
 
   it('P-14 · se puede leer una cabecera de la respuesta anterior', async () => {
     const t = await encadenar(
-      `# @name uno\nGET ${BASE}/json\n\n###\n\n# segunda\nGET ${BASE}/eco?v={{uno.response.headers.content-type}}\n`,
-      '/eco',
+      `# @name uno\nGET ${BASE}/json\n\n###\n\n# segunda\nGET ${BASE}/eco-cab?v={{uno.response.headers.content-type}}\n`,
+      '/eco-cab',
     );
     assert.ok(t.includes('application/json'), `la cabecera no se resolvió:\n${t.slice(0, 250)}`);
   });

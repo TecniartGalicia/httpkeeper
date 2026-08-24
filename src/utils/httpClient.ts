@@ -3,9 +3,8 @@ import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
-import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
-import { IRestClientSettings, SystemSettings } from '../models/configurationSettings';
+import type { IRestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { awsCognito } from './auth/awsCognito';
@@ -15,7 +14,39 @@ import { MimeUtility } from './mimeUtility';
 import { getHeader, removeHeader } from './misc';
 import { convertBufferToStream, convertStreamToBuffer } from './streamUtility';
 import { UserDataManager } from './userDataManager';
-import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
+import { Entorno } from '../core/entorno';
+
+function ajustesDelEditor(): IRestClientSettings {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('../models/configurationSettings').SystemSettings.Instance;
+}
+
+/**
+ * Entorno por defecto: el del editor. Es el único punto de este fichero que
+ * conoce VS Code, y se carga en diferido para que el runner de terminal nunca
+ * llegue a importarlo.
+ */
+const ENTORNO_EDITOR: Entorno = {
+    avisar: (mensaje: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { window } = require('vscode');
+        window.showWarningMessage(mensaje);
+    },
+    raiz: () => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const raiz = require('./workspaceUtility').getWorkspaceRootPath();
+        if (!raiz) {
+            return undefined;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { Uri } = require('vscode');
+        return Uri.parse(raiz).fsPath as string;
+    },
+    ficheroActual: () => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        return require('./workspaceUtility').getCurrentHttpFileName();
+    }
+};
 
 import { CancelableRequest, Headers, Method, OptionsOfBufferResponseBody, Response } from 'got';
 import got = require('got');
@@ -33,13 +64,16 @@ type Certificate = {
 export class HttpClient {
     private cookieStore: Store;
 
-    public constructor() {
+    public constructor(private readonly _entorno?: Entorno) {
         const cookieFilePath = UserDataManager.cookieFilePath;
         this.cookieStore = new CookieFileStore(cookieFilePath) as Store;
     }
 
     public async send(httpRequest: HttpRequest, settings?: IRestClientSettings): Promise<HttpResponse> {
-        settings = settings || SystemSettings.Instance;
+        // Los ajustes del editor se cargan en diferido: quien llame desde la
+        // terminal pasa los suyos y nunca entra aquí, que es lo que mantiene
+        // este fichero libre de VS Code.
+        settings = settings || ajustesDelEditor();
 
         const options = await this.prepareOptions(httpRequest, settings);
 
@@ -253,6 +287,14 @@ export class HttpClient {
         return false;
     }
 
+    /**
+     * Avisos y raíz de rutas. Inyectarlos es lo único que separaba a este
+     * cliente de poder ejecutarse fuera de VS Code.
+     */
+    private get entorno(): Entorno {
+        return this._entorno ?? ENTORNO_EDITOR;
+    }
+
     private resolveCertificate(absoluteOrRelativePath: string | undefined): Buffer | undefined {
         if (absoluteOrRelativePath === undefined) {
             return undefined;
@@ -260,7 +302,7 @@ export class HttpClient {
 
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
+                this.entorno.avisar(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             } else {
                 return fs.readFileSync(absoluteOrRelativePath);
@@ -268,19 +310,19 @@ export class HttpClient {
         }
 
         // the path should be relative path
-        const rootPath = getWorkspaceRootPath();
+        const rootPath = this.entorno.raiz();
         let absolutePath = '';
         if (rootPath) {
-            absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
+            absolutePath = path.join(rootPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
                 return fs.readFileSync(absolutePath);
             } else {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
+                this.entorno.avisar(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             }
         }
 
-        const currentFilePath = getCurrentHttpFileName();
+        const currentFilePath = this.entorno.ficheroActual();
         if (!currentFilePath) {
             return undefined;
         }
@@ -289,7 +331,7 @@ export class HttpClient {
         if (fs.existsSync(absolutePath)) {
             return fs.readFileSync(absolutePath);
         } else {
-            window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
+            this.entorno.avisar(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
             return undefined;
         }
     }

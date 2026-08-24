@@ -1,5 +1,5 @@
 
-export const ExtensionId: string = 'humao.rest-client';
+export const ExtensionId: string = 'argalla.httpkeeper';
 
 export const NoEnvironmentSelectedName: string = 'c0cfe680-4fcd-4b71-a4ba-8cfaee57680a';
 

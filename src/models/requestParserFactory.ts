@@ -1,6 +1,6 @@
 import { CurlRequestParser } from '../utils/curlRequestParser';
 import { HttpRequestParser } from '../utils/httpRequestParser';
-import { IRestClientSettings, SystemSettings } from './configurationSettings';
+import type { IRestClientSettings } from './configurationSettings';
 import { RequestParser } from './requestParser';
 
 export class RequestParserFactory {
@@ -10,11 +10,14 @@ export class RequestParserFactory {
     public static createRequestParser(rawRequest: string): RequestParser;
     public static createRequestParser(rawRequest: string, settings: IRestClientSettings): RequestParser;
     public static createRequestParser(rawHttpRequest: string, settings?: IRestClientSettings): RequestParser {
-        settings = settings || SystemSettings.Instance;
+        // Los ajustes del editor se cargan en diferido: quien parsea desde la
+        // terminal pasa los suyos y nunca llega a importar VS Code.
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const ajustes: IRestClientSettings = settings ?? require('./configurationSettings').SystemSettings.Instance;
         if (RequestParserFactory.curlRegex.test(rawHttpRequest)) {
-            return new CurlRequestParser(rawHttpRequest, settings);
+            return new CurlRequestParser(rawHttpRequest, ajustes);
         } else {
-            return new HttpRequestParser(rawHttpRequest, settings);
+            return new HttpRequestParser(rawHttpRequest, ajustes);
         }
     }
 }

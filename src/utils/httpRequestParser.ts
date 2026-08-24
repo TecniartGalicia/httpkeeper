@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { Stream } from 'stream';
-import { IRestClientSettings } from '../models/configurationSettings';
+import type { IRestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';

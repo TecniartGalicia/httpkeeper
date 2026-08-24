@@ -36,6 +36,17 @@ s.listen(0,'127.0.0.1',()=>console.log(JSON.stringify({puerto:s.address().port})
   });
   console.log(`servidor de prueba en el puerto ${puerto}`);
 
+  // Se simula a alguien que YA tenía REST Client: sus ajustes viven en el
+  // settings.json del usuario. VS Code no deja escribirlos desde la API si la
+  // sección no está declarada por ninguna extensión instalada, así que la única
+  // forma fiel de probar la herencia es dejarlos puestos de antemano.
+  const userDir = path.join(raiz, '.vscode-test', 'user-data', 'User');
+  fs.mkdirSync(userDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(userDir, 'settings.json'),
+    JSON.stringify({ 'rest-client.defaultHeaders': { 'User-Agent': 'viene-de-restclient' } }, null, 2),
+  );
+
   try {
     await runTests({
       extensionDevelopmentPath: raiz,

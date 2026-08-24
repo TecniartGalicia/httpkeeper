@@ -1,9 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { Uri } from 'vscode';
 import { RequestHeaders } from "../models/base";
 import { removeHeader } from './misc';
-import { getCurrentTextDocument, getWorkspaceRootPath } from './workspaceUtility';
 
 export function parseRequestHeaders(headerLines: string[], defaultHeaders: RequestHeaders, url: string): RequestHeaders {
     // message-header = field-name ":" [ field-value ]
@@ -38,20 +36,36 @@ export function parseRequestHeaders(headerLines: string[], defaultHeaders: Reque
     return { ...defaultHeaders, ...headers };
 }
 
+/** Utilidades del editor, sólo si estamos dentro de él. */
+function enEditor(): typeof import('./workspaceUtility') | undefined {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('vscode');
+    } catch {
+        return undefined;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('./workspaceUtility');
+}
+
 export async function resolveRequestBodyPath(refPath: string): Promise<string | undefined> {
     if (path.isAbsolute(refPath)) {
         return (await fs.pathExists(refPath)) ? refPath : undefined;
     }
 
-    const workspaceRoot = getWorkspaceRootPath();
+    // El editor se consulta en diferido: fuera de VS Code este bloque no corre
+    // y la ruta se resuelve contra el fichero actual, más abajo.
+    const workspaceRoot = enEditor()?.getWorkspaceRootPath();
     if (workspaceRoot) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { Uri } = require('vscode');
         const absolutePath = path.join(Uri.parse(workspaceRoot).fsPath, refPath);
         if (await fs.pathExists(absolutePath)) {
             return absolutePath;
         }
     }
 
-    const currentFile = getCurrentTextDocument()?.fileName;
+    const currentFile = enEditor()?.getCurrentTextDocument()?.fileName;
     if (currentFile) {
         const absolutePath = path.join(path.dirname(currentFile), refPath);
         if (await fs.pathExists(absolutePath)) {

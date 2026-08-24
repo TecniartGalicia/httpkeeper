@@ -10,3 +10,4 @@ npm-debug.log*
 .vscode-test/
 out-test/
 *.vsix
+dist-cli/

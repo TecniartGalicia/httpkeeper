@@ -112,7 +112,9 @@ export class RequestVariableCacheValueProcessor {
 
     private static resolveXmlHttpBody(body: any, path: string): ResolveResult {
         try {
-            const doc = new DOMParser().parseFromString(body);
+            // @xmldom/xmldom exige el tipo MIME: sin él lanza y el XPath se
+            // quedaba sin resolver, con la variable literal viajando en la URL.
+            const doc = new DOMParser().parseFromString(body, 'text/xml');
             const results = xpath.select(path, doc);
             if (typeof results === 'string') {
                 return { state: ResolveState.Success, value: results };
