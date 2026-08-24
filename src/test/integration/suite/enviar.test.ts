@@ -251,12 +251,14 @@ describe('HttpKeeper · variables de petición', () => {
 
     // Se espera a la respuesta CONCRETA de esta primera petición: el documento
     // de respuesta se reutiliza y podría haber un 200 de una prueba anterior.
-    const testigo = lineas[primera + 1].split('/').pop()!;
+    // El servidor marca cada respuesta con `x-ruta`, así que se espera a la de
+    // ESTA petición y no a un 200 que dejó una prueba anterior.
+    const ruta = '/' + lineas[primera + 1].split('/').pop()!;
     let lista = false;
     for (let i = 0; i < 60 && !lista; i++) {
       await esperar(250);
       lista = vscode.workspace.textDocuments.some(
-        (d) => d.uri.toString() !== doc.uri.toString() && d.getText().includes('HTTP/1.1 200') && d.getText().includes(testigo === 'json' ? 'anidado' : 'hijo'),
+        (d) => d.uri.toString() !== doc.uri.toString() && d.getText().includes('HTTP/1.1 200') && d.getText().includes('x-ruta: ' + ruta),
       );
     }
     assert.ok(lista, 'la primera petición no llegó a responder');
@@ -295,6 +297,16 @@ describe('HttpKeeper · variables de petición', () => {
       '/eco-xml',
     );
     assert.ok(t.includes('/eco-xml?v=valor'), `el XPath no se resolvió:\n${t.slice(0, 250)}`);
+  });
+
+  // PR #853: un JSONPath que casa con varios valores devolvía solo el primero
+  // en silencio, que es peor que no devolver nada: parece que funciona.
+  it('P-29 · un JSONPath con varios resultados los devuelve todos', async () => {
+    const t = await encadenar(
+      `# @name uno` + BR + `GET ${BASE}/lista` + BR + BR + '###' + BR + BR + `GET ${BASE}/eco-lista?v={{uno.response.body.$.items[*].id}}` + BR,
+      '/eco-lista',
+    );
+    assert.ok(t.includes('7') && t.includes('9'), `deberían venir los dos identificadores:` + BR + t.slice(0, 250));
   });
 
   it('P-14 · se puede leer una cabecera de la respuesta anterior', async () => {
