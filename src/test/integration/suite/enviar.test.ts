@@ -143,6 +143,36 @@ describe('HttpKeeper · peticiones reales', () => {
   });
 });
 
+describe('HttpKeeper · vista previa', () => {
+  before(async () => {
+    const ext = vscode.extensions.getExtension('argalla.httpkeeper');
+    await ext!.activate();
+  });
+
+  after(async () => {
+    await ajuste('previewResponseInUntitledDocument', true);
+  });
+
+  // PR #1440: en Cursor `window.activeTextEditor.viewColumn` puede ser
+  // undefined y la respuesta no se mostraba. Este es el camino que fallaba.
+  it('P-26 · muestra la respuesta en el panel, no solo en un documento', async () => {
+    await ajuste('previewResponseInUntitledDocument', false);
+    const doc = await vscode.workspace.openTextDocument({ language: 'http', content: `GET ${BASE}/panel` + BR });
+    await vscode.window.showTextDocument(doc, { preview: false });
+    await vscode.commands.executeCommand('httpkeeper.request');
+
+    // El panel de respuesta es un webview: se comprueba que aparece una pestaña
+    // nueva sin que el comando haya lanzado.
+    let hay = false;
+    for (let i = 0; i < 60 && !hay; i++) {
+      await esperar(250);
+      hay = vscode.window.tabGroups.all.some(g =>
+        g.tabs.some(t => t.input instanceof vscode.TabInputWebview || /Response/i.test(t.label)));
+    }
+    assert.ok(hay, 'no apareció el panel de respuesta');
+  });
+});
+
 describe('HttpKeeper · variables de petición', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('argalla.httpkeeper');
