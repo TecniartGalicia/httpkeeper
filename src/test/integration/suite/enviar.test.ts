@@ -114,6 +114,34 @@ describe('HttpKeeper · peticiones reales', () => {
     });
   });
 
+  describe('reenvío de peticiones', () => {
+    // PR #1432 (arregla el issue #682): al preparar la petición se modificaban
+    // las cabeceras del objeto original, así que un reenvío salía con las
+    // cabeceras ya manipuladas. Ahora se trabaja sobre una copia.
+    it('P-28 · reenviar una petición no arrastra cabeceras manipuladas', async () => {
+      const doc = await vscode.workspace.openTextDocument({
+        language: 'http',
+        content: `POST ${BASE}/reenvio` + BR + 'Content-Type: application/json' + BR + 'X-Prueba: original' + BR + BR + '{"n":1}' + BR
+      });
+      await vscode.window.showTextDocument(doc, { preview: false });
+      await vscode.commands.executeCommand('httpkeeper.request');
+      await esperar(1500);
+      // Se reenvía la misma petición: debe llegar idéntica.
+      await vscode.window.showTextDocument(doc, { preview: false });
+      await vscode.commands.executeCommand('httpkeeper.rerun-last-request');
+
+      let texto = '';
+      for (let i = 0; i < 60 && !texto.includes('original'); i++) {
+        await esperar(250);
+        texto = vscode.workspace.textDocuments
+          .filter(d => d.uri.toString() !== doc.uri.toString())
+          .map(d => d.getText()).find(t => t.includes('/reenvio')) ?? '';
+      }
+      assert.ok(texto.includes('original'), `el reenvío perdió la cabecera:` + BR + texto.slice(0, 250));
+      assert.ok(texto.includes('HTTP/1.1 200'));
+    });
+  });
+
   describe('compatibilidad', () => {
     it('P-10 · un ajuste propio se aplica', async () => {
       await ajuste('defaultHeaders', { 'User-Agent': 'httpkeeper-propio' });
