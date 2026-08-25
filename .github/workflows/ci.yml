@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Types
+        run: npx tsc -p ./ --noEmit --skipLibCheck
+      - name: Unit tests
+        run: npm run test:unit
+      - name: Translations
+        run: npm run test:l10n
+      - name: Terminal runner
+        run: npm run test:cli
+      - name: Integration tests (Linux needs a display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:integration
+      - name: Integration tests
+        if: runner.os != 'Linux'
+        run: npm run test:integration
+      - name: The packaged .vsix, installed and exercised
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:vsix
+      - name: Audit (identity, credit, privacy, deps, isolation)
+        run: npm run audit
+      - name: Package
+        run: npx vsce package --no-dependencies -o httpkeeper.vsix
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: vsix
+          path: httpkeeper.vsix

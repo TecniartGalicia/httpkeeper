@@ -3,6 +3,7 @@
 'use strict';
 
 const path = require('path');
+const webpack = require('webpack');
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -16,6 +17,17 @@ const config = {
         devtoolModuleFilenameTemplate: "../[resource-path]",
     },
     devtool: 'source-map',
+    // El runner de terminal se publica como binario (package.json -> bin), asi
+    // que su bundle necesita el shebang. Solo ese chunk: en extension.js una
+    // primera linea con # rompe la carga del editor.
+    plugins: [
+        new webpack.BannerPlugin({
+            banner: '#!/usr/bin/env node',
+            raw: true,
+            entryOnly: true,
+            include: /^cli\.js$/
+        })
+    ],
     externals: {
         vscode: "commonjs vscode" // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     },

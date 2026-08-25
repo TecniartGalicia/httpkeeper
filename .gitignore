@@ -11,3 +11,6 @@ npm-debug.log*
 out-test/
 *.vsix
 dist-cli/
+
+# Fotogramas crudos de la demo: pesan y se regeneran con npm run demo
+media/demo/

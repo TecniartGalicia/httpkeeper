@@ -107,6 +107,7 @@ describe('aserciones', () => {
         assert.strictEqual(valorDe('headers.content-type', r), 'application/json; charset=utf-8');
         assert.strictEqual(valorDe('headers.CONTENT-TYPE', r), 'application/json; charset=utf-8', 'las cabeceras no distinguen mayusculas');
         assert.strictEqual(valorDe('body.$.no-existe', r), '');
+        assert.strictEqual(valorDe('header.content-type', r), 'application/json; charset=utf-8', 'header en singular tambien vale');
     });
 
     it('P-21 · los siete operadores, con su caso bueno y su caso malo', () => {
@@ -141,5 +142,19 @@ describe('aserciones', () => {
     it('una respuesta sin cuerpo no rompe nada', () => {
         const res = comprobar(leerAserciones('# @assert body.$.a exists'), { ms: 5 });
         assert.strictEqual(res[0].pasa, false);
+    });
+
+    it('P-31 · un sujeto que no existe se dice, no se calla', () => {
+        const r = { estado: 200, cuerpo: '{}', cabeceras: { 'content-type': 'application/json' }, ms: 5 };
+        const [mal] = comprobar(leerAserciones('# @assert cabecera.content-type contains json'), r);
+        assert.strictEqual(mal.pasa, false);
+        assert.ok(mal.obtenido.includes('cabecera.content-type'), 'el mensaje nombra el sujeto');
+
+        // Lo peligroso era !=: contra '' pasaba, y el fichero parecia verde.
+        const [negada] = comprobar(leerAserciones('# @assert lo.que.sea != 200'), r);
+        assert.strictEqual(negada.pasa, false, 'un sujeto desconocido no puede dar por buena una asercion');
+
+        const [bien] = comprobar(leerAserciones('# @assert header.content-type contains json'), r);
+        assert.strictEqual(bien.pasa, true);
     });
 });

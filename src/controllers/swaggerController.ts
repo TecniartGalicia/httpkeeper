@@ -22,14 +22,14 @@ export class SwaggerController {
             detail: `${dayjs().to(existingFiles[fileName].timestamp)}`,
         }));
         const clearStateItem: vscode.QuickPickItem = {
-            label: 'Clear imported files',
+            label: vscode.l10n.t('Clear imported files'),
         };
         const items = [importFromFileItem, ...recentImportsItems];
         if (recentImportsItems.length > 0) {
             items.push(clearStateItem);
         }
         const selectedItem = await vscode.window.showQuickPick(items, {
-            placeHolder: 'Select an option',
+            placeHolder: vscode.l10n.t('Select an option'),
         });
 
         // Handle the user's selection
@@ -37,9 +37,9 @@ export class SwaggerController {
             if (selectedItem === importFromFileItem) {
                 const options: vscode.OpenDialogOptions = {
                     canSelectMany: false,
-                    openLabel: 'Import',
+                    openLabel: vscode.l10n.t('Import'),
                     filters: {
-                        'YAML and JSON files': ['yml', 'yaml', 'json'],
+                        [vscode.l10n.t('YAML and JSON files')]: ['yml', 'yaml', 'json'],
                     },
                 };
 
@@ -52,14 +52,14 @@ export class SwaggerController {
                 }
             } else if (selectedItem === clearStateItem) {
                 this.clearImportedFiles();
-                vscode.window.showInformationMessage('Imported files have been cleared.');
+                vscode.window.showInformationMessage(vscode.l10n.t('Imported files have been cleared.'));
             } else {
                 const selectedFile = selectedItem.label;
                 const fileContent = existingFiles[selectedFile];
                 this.createNewFileWithProcessedContent(fileContent.content);
             }
         } else {
-            vscode.window.showInformationMessage('No option selected');
+            vscode.window.showInformationMessage(vscode.l10n.t('No option selected'));
         }
     }
 

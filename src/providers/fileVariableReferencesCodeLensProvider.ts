@@ -1,4 +1,4 @@
-import { CancellationToken, CodeLens, CodeLensProvider, Command, Location, Range, TextDocument } from 'vscode';
+import { CancellationToken, CodeLens, CodeLensProvider, Command, l10n, Location, Range, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { DocumentCache } from '../models/documentCache';
 import { Selector } from '../utils/selector';
@@ -32,7 +32,7 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
                     const locations = VariableUtility.getFileVariableReferenceRanges(lines, variableName);
                     const cmd: Command = {
                         arguments: [document.uri, range.start, locations.map(loc => new Location(document.uri, loc))],
-                        title: locations.length === 1 ? '1 reference' : `${locations.length} references`,
+                        title: locations.length === 1 ? l10n.t('1 reference') : l10n.t('{0} references', locations.length),
                         command: locations.length ? 'editor.action.showReferences' : '',
                     };
                     blocks.push(new CodeLens(range, cmd));

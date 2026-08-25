@@ -1,7 +1,7 @@
 {
     "name": "httpkeeper",
     "displayName": "HttpKeeper",
-    "description": "Send HTTP requests from a .http file and read the response in the editor. No account, no cloud, no paywall. A maintained fork of REST Client.",
+    "description": "%ext.description%",
     "version": "1.0.0",
     "publisher": "argalla",
     "author": {
@@ -80,114 +80,114 @@
         "commands": [
             {
                 "command": "httpkeeper.request",
-                "title": "Send Request",
-                "category": "Rest Client"
+                "title": "%cmd.request%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.rerun-last-request",
-                "title": "Rerun Last Request",
-                "category": "Rest Client"
+                "title": "%cmd.rerun-last-request%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.cancel-request",
-                "title": "Cancel Request",
-                "category": "Rest Client"
+                "title": "%cmd.cancel-request%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.switch-environment",
-                "title": "Switch Environment",
-                "category": "Rest Client"
+                "title": "%cmd.switch-environment%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.history",
-                "title": "View Request History",
-                "category": "Rest Client"
+                "title": "%cmd.history%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.clear-history",
-                "title": "Clear Request History",
-                "category": "Rest Client"
+                "title": "%cmd.clear-history%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.save-response",
-                "title": "Save Full Response",
+                "title": "%cmd.save-response%",
                 "icon": {
                     "light": "./images/save.svg",
                     "dark": "./images/save-inverse.svg"
                 },
-                "category": "Rest Client"
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.save-response-body",
-                "title": "Save Response Body",
+                "title": "%cmd.save-response-body%",
                 "icon": {
                     "light": "./images/save-body.svg",
                     "dark": "./images/save-body-inverse.svg"
                 },
-                "category": "Rest Client"
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.copy-response-body",
-                "title": "Copy Response Body",
+                "title": "%cmd.copy-response-body%",
                 "icon": {
                     "light": "./images/copy.svg",
                     "dark": "./images/copy-inverse.svg"
                 },
-                "category": "Rest Client"
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.generate-codesnippet",
-                "title": "Generate Code Snippet",
-                "category": "Rest Client"
+                "title": "%cmd.generate-codesnippet%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.copy-codesnippet",
-                "title": "Copy Code Snippet",
+                "title": "%cmd.copy-codesnippet%",
                 "icon": {
                     "light": "./images/copy.svg",
                     "dark": "./images/copy-inverse.svg"
                 },
-                "category": "Rest Client"
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.copy-request-as-curl",
-                "title": "Copy Request As cURL",
-                "category": "Rest Client"
+                "title": "%cmd.copy-request-as-curl%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.clear-aad-token-cache",
-                "title": "Clear Azure AD Token Cache",
-                "category": "Rest Client"
+                "title": "%cmd.clear-aad-token-cache%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.clear-cookies",
-                "title": "Clear cookies",
-                "category": "Rest Client"
+                "title": "%cmd.clear-cookies%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.fold-response",
-                "title": "Fold Response",
-                "category": "Rest Client"
+                "title": "%cmd.fold-response%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.unfold-response",
-                "title": "Unfold Response",
-                "category": "Rest Client"
+                "title": "%cmd.unfold-response%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.preview-html-response-body",
-                "title": "HTML Preview",
-                "category": "Rest Client"
+                "title": "%cmd.preview-html-response-body%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.show-raw-response",
-                "title": "Raw",
-                "category": "Rest Client"
+                "title": "%cmd.show-raw-response%",
+                "category": "HttpKeeper"
             },
             {
                 "command": "httpkeeper.import-swagger",
-                "title": "Import from file",
-                "category": "Rest Client"
+                "title": "%cmd.import-swagger%",
+                "category": "HttpKeeper"
             }
         ],
         "menus": {
@@ -353,13 +353,13 @@
         ],
         "configuration": {
             "type": "object",
-            "title": "REST Client",
+            "title": "HttpKeeper",
             "properties": {
                 "httpkeeper.followredirect": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "description": "Follow HTTP 3xx responses as redirects."
+                    "description": "%cfg.followredirect%"
                 },
                 "httpkeeper.defaultHeaders": {
                     "type": "object",
@@ -367,48 +367,48 @@
                         "User-Agent": "vscode-restclient"
                     },
                     "scope": "resource",
-                    "description": "If particular headers are omitted in request headers, these will be added as headers for each request."
+                    "description": "%cfg.defaultHeaders%"
                 },
                 "httpkeeper.timeoutinmilliseconds": {
                     "type": "integer",
                     "default": 0,
                     "scope": "resource",
-                    "description": "Timeout in milliseconds. 0 for infinity"
+                    "description": "%cfg.timeoutinmilliseconds%"
                 },
                 "httpkeeper.showResponseInDifferentTab": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
-                    "description": "Show response in different tab"
+                    "description": "%cfg.showResponseInDifferentTab%"
                 },
                 "httpkeeper.requestNameAsResponseTabTitle": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
-                    "description": "Show request name as the response tab title"
+                    "description": "%cfg.requestNameAsResponseTabTitle%"
                 },
                 "httpkeeper.rememberCookiesForSubsequentRequests": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "description": "Remember cookies for subsequent requests"
+                    "description": "%cfg.rememberCookiesForSubsequentRequests%"
                 },
                 "httpkeeper.excludeHostsForProxy": {
                     "type": "array",
                     "default": [],
                     "scope": "resource",
-                    "description": "Excluded hosts when using using proxy settings"
+                    "description": "%cfg.excludeHostsForProxy%"
                 },
                 "httpkeeper.fontSize": {
                     "type": "number",
                     "scope": "resource",
-                    "markdownDescription": "Controls the font size in pixels used in the response preview. When set to `0`, the value of `#editor.fontSize#` is used."
+                    "markdownDescription": "%cfg.fontSize%"
                 },
                 "httpkeeper.fontFamily": {
                     "type": "string",
                     "default": null,
                     "scope": "resource",
-                    "description": "Controls the font family used in the response preview"
+                    "description": "%cfg.fontFamily%"
                 },
                 "httpkeeper.fontWeight": {
                     "type": "string",
@@ -428,7 +428,7 @@
                         "900"
                     ],
                     "scope": "resource",
-                    "description": "Controls the font weight used in the response preview"
+                    "description": "%cfg.fontWeight%"
                 },
                 "httpkeeper.environmentVariables": {
                     "type": "object",
@@ -436,7 +436,7 @@
                         "$shared": {}
                     },
                     "scope": "resource",
-                    "markdownDescription": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., `{\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}}`)",
+                    "markdownDescription": "%cfg.environmentVariables%",
                     "additionalProperties": {
                         "anyOf": [
                             {
@@ -466,25 +466,25 @@
                             }
                         ]
                     },
-                    "markdownDescription": "Sets the custom mapping of mime type and file extension of saved response body (e.g., `{\"application/atom+xml\": \"xml\"}`)"
+                    "markdownDescription": "%cfg.mimeAndFileExtensionMapping%"
                 },
                 "httpkeeper.previewResponseInUntitledDocument": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
-                    "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
+                    "description": "%cfg.previewResponseInUntitledDocument%"
                 },
                 "httpkeeper.oidcScopes": {
                     "type": "array",
                     "default": [],
                     "scope": "resource",
-                    "description": "Scopes to be used by the OIDC client, default: [openid profile email]"
+                    "description": "%cfg.oidcScopes%"
                 },
                 "httpkeeper.oidcCertificates": {
                     "type": "object",
                     "default": {},
                     "scope": "resource",
-                    "description": "Certificate paths for Oidc callback server",
+                    "description": "%cfg.oidcCertificates%",
                     "pattern": "^(?!http(s?)://)",
                     "additionalProperties": {
                         "anyOf": [
@@ -526,7 +526,7 @@
                     "type": "object",
                     "default": {},
                     "scope": "resource",
-                    "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)",
+                    "description": "%cfg.certificates%",
                     "pattern": "^(?!http(s?)://)",
                     "additionalProperties": {
                         "anyOf": [
@@ -568,7 +568,7 @@
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
-                    "description": "Suppress response body content type validation"
+                    "description": "%cfg.suppressResponseBodyContentTypeValidationWarning%"
                 },
                 "httpkeeper.previewOption": {
                     "type": "string",
@@ -586,19 +586,19 @@
                     ],
                     "default": "full",
                     "scope": "resource",
-                    "description": "Response preview output option"
+                    "description": "%cfg.previewOption%"
                 },
                 "httpkeeper.disableHighlightResponseBodyForLargeResponse": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "markdownDescription": "Controls whether to highlight response body for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`"
+                    "markdownDescription": "%cfg.disableHighlightResponseBodyForLargeResponse%"
                 },
                 "httpkeeper.disableAddingHrefLinkForLargeResponse": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "markdownDescription": "Controls whether to add href link in previewed response for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`"
+                    "markdownDescription": "%cfg.disableAddingHrefLinkForLargeResponse%"
                 },
                 "httpkeeper.largeResponseBodySizeLimitInMB": {
                     "type": "number",
@@ -606,7 +606,7 @@
                     "minimum": 0,
                     "exclusiveMinimum": true,
                     "scope": "resource",
-                    "markdownDescription": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResponseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true"
+                    "markdownDescription": "%cfg.largeResponseBodySizeLimitInMB%"
                 },
                 "httpkeeper.previewColumn": {
                     "type": "string",
@@ -620,13 +620,13 @@
                     ],
                     "default": "beside",
                     "scope": "resource",
-                    "description": "Response preview column option"
+                    "description": "%cfg.previewColumn%"
                 },
                 "httpkeeper.previewResponsePanelTakeFocus": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "description": "Preview response panel will take focus after receiving response."
+                    "description": "%cfg.previewResponsePanelTakeFocus%"
                 },
                 "httpkeeper.formParamEncodingStrategy": {
                     "type": "string",
@@ -642,19 +642,19 @@
                     ],
                     "default": "automatic",
                     "scope": "resource",
-                    "markdownDescription": "Form param encoding strategy for request body of `x-www-form-urlencoded`."
+                    "markdownDescription": "%cfg.formParamEncodingStrategy%"
                 },
                 "httpkeeper.addRequestBodyLineIndentationAroundBrackets": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "markdownDescription": "Add line indentation around brackets(`{}`, `<>`, `[]`) in request body when pressing enter."
+                    "markdownDescription": "%cfg.addRequestBodyLineIndentationAroundBrackets%"
                 },
                 "httpkeeper.decodeEscapedUnicodeCharacters": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
-                    "description": "Decode escaped unicode characters in response body."
+                    "description": "%cfg.decodeEscapedUnicodeCharacters%"
                 },
                 "httpkeeper.logLevel": {
                     "type": "string",
@@ -666,25 +666,25 @@
                     ],
                     "default": "error",
                     "scope": "resource",
-                    "description": "The verbosity of logging in the REST output panel"
+                    "description": "%cfg.logLevel%"
                 },
                 "httpkeeper.enableSendRequestCodeLens": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "description": "Enable/disable sending request CodeLens in request file"
+                    "description": "%cfg.enableSendRequestCodeLens%"
                 },
                 "httpkeeper.enableCustomVariableReferencesCodeLens": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "description": "Enable/disable custom variable references CodeLens in request file"
+                    "description": "%cfg.enableCustomVariableReferencesCodeLens%"
                 },
                 "httpkeeper.useContentDispositionFilename": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
-                    "description": "Enable/disable using filename from 'content-disposition' header, when saving response body"
+                    "description": "%cfg.useContentDispositionFilename%"
                 }
             }
         },
@@ -710,7 +710,10 @@
         "build:cli": "tsc -p tsconfig.cli.json",
         "test:cli": "npm run build:cli && node scripts/probar-cli.mjs",
         "audit": "node scripts/auditoria.mjs",
-        "check": "npx tsc -p ./ --noEmit --skipLibCheck && npm run test:unit && npm run build:cli && npm run test:cli && npm run audit"
+        "check": "npx tsc -p ./ --noEmit --skipLibCheck && npm run test:unit && npm run build:cli && npm run test:cli && npm run test:l10n && npm run audit && npm run test:vsix",
+        "test:l10n": "node scripts/comprobar-l10n.mjs",
+        "test:vsix": "node scripts/probar-vsix.mjs",
+        "demo": "node scripts/demo/lanzar.mjs && node scripts/demo/montar.mjs"
     },
     "devDependencies": {
         "@types/aws4": "^1.5.1",
@@ -772,7 +775,7 @@
         }
     },
     "bin": {
-        "httpkeeper": "./dist-cli/cli/index.js"
+        "httpkeeper": "./dist/cli.js"
     },
     "overrides": {
         "axios": "^1.12.0",

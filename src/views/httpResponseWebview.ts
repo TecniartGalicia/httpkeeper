@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
-import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
+import { Clipboard, commands, env, ExtensionContext, l10n, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
 import { SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
@@ -16,8 +16,8 @@ import { BaseWebview } from './baseWebview';
 const hljs = require('highlight.js');
 const contentDisposition = require('content-disposition');
 
-const OPEN = 'Open';
-const COPYPATH = 'Copy Path';
+const OPEN = l10n.t('Open');
+const COPYPATH = l10n.t('Copy Path');
 
 type FoldingRange = [number, number];
 
@@ -169,7 +169,7 @@ export class HttpResponseWebview extends BaseWebview {
             try {
                 await this.openSaveDialog(defaultFilePath, fullResponse);
             } catch {
-                window.showErrorMessage('Failed to save latest response to disk.');
+                window.showErrorMessage(l10n.t('Failed to save latest response to disk.'));
             }
         }
     }
@@ -183,7 +183,7 @@ export class HttpResponseWebview extends BaseWebview {
             try {
                 await this.openSaveDialog(defaultFilePath, this.activeResponse.bodyBuffer);
             } catch {
-                window.showErrorMessage('Failed to save latest response body to disk');
+                window.showErrorMessage(l10n.t('Failed to save latest response body to disk'));
             }
         }
     }
@@ -225,7 +225,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         const filePath = uri.fsPath;
         await fs.writeFile(filePath, content, { flag: 'w' });
-        const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: OPEN }, { title: COPYPATH });
+        const btn = await window.showInformationMessage(l10n.t('Saved to {0}', filePath), { title: OPEN }, { title: COPYPATH });
         if (btn?.title === OPEN) {
             workspace.openTextDocument(filePath).then(window.showTextDocument);
         } else if (btn?.title === COPYPATH) {

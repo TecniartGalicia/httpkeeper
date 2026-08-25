@@ -1,4 +1,4 @@
-import { CancellationToken, CodeLens, CodeLensProvider, Command, Range, TextDocument } from 'vscode';
+import { CancellationToken, CodeLens, CodeLensProvider, Command, l10n, Range, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { Selector } from '../utils/selector';
 
@@ -12,7 +12,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             const range = new Range(blockStart, 0, blockEnd, 0);
             const cmd: Command = {
                 arguments: [document, range],
-                title: 'Send Request',
+                title: l10n.t('Send Request'),
                 command: 'httpkeeper.request'
             };
             blocks.push(new CodeLens(range, cmd));

@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Position, Range, TextDocument, TextEditor, window } from 'vscode';
+import { l10n, Position, Range, TextDocument, TextEditor, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { fromString as ParseReqMetaKey, RequestMetadata } from '../models/requestMetadata';
 import { SelectedRequest } from '../models/SelectedRequest';
@@ -287,7 +287,7 @@ export class Selector {
                 password = true;
             }
             const value = await window.showInputBox({
-                prompt: `Input value for "${name}"`,
+                prompt: l10n.t('Input value for "{0}"', name),
                 placeHolder: description,
                 password: password,
             });

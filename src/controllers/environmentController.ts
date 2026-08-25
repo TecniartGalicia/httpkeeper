@@ -1,4 +1,4 @@
-import { EventEmitter, QuickPickItem, window } from 'vscode';
+import { EventEmitter, l10n, QuickPickItem, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { SystemSettings } from '../models/configurationSettings';
 import { trace } from "../utils/decorator";
@@ -44,7 +44,7 @@ export class EnvironmentController {
                 }));
 
         const itemPickList: EnvironmentPickItem[] = [EnvironmentController.noEnvironmentPickItem, ...userEnvironments];
-        const item = await window.showQuickPick(itemPickList, { placeHolder: "Select REST Client Environment" });
+        const item = await window.showQuickPick(itemPickList, { placeHolder: l10n.t('Select HttpKeeper environment') });
         if (!item) {
             return;
         }

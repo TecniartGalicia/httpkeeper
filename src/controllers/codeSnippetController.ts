@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 import * as url from 'url';
-import { Clipboard, env, ExtensionContext, QuickInputButtons, window } from 'vscode';
+import { Clipboard, env, ExtensionContext, l10n, QuickInputButtons, window } from 'vscode';
 import Logger from '../logger';
 import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
@@ -64,7 +64,7 @@ export class CodeSnippetController {
 
         const quickPick = window.createQuickPick();
         const targetQuickPickItems = this._availableTargets.map(target => ({ label: target.title, ...target }));
-        quickPick.title = 'Generate Code Snippet';
+        quickPick.title = l10n.t('Generate Code Snippet');
         quickPick.step = 1;
         quickPick.totalSteps = 2;
         quickPick.items = targetQuickPickItems;

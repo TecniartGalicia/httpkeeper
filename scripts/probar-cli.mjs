@@ -6,6 +6,13 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+const RUNNER = process.env.CLI_RUTA ?? 'dist-cli/cli/index.js';
+if (!fs.existsSync(RUNNER)) {
+  console.error(`no existe el runner ${RUNNER}: compilalo antes (npm run build:cli o npx webpack)`);
+  process.exit(2);
+}
+console.log(`runner: ${RUNNER}`);
+
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'cli-prueba-'));
 const servidor = path.join(tmp, 'servidor.cjs');
 fs.writeFileSync(servidor, `
@@ -58,6 +65,9 @@ const bueno = escribir('api.http', [
   '',
   '# @assert status == 200',
   '# @assert body.$.total == 3',
+  '# @assert header.content-type contains json',
+  '# @assert headers.content-type contains application',
+  '# @assert time < 10000',
 ]);
 
 const malo = escribir('falla.http', [
@@ -67,7 +77,7 @@ const malo = escribir('falla.http', [
 ]);
 
 const correr = (args) => new Promise((res) => {
-  const p = spawn(process.execPath, ['dist-cli/cli/index.js', ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
+  const p = spawn(process.execPath, [RUNNER, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
   let salida = '', error = '';
   p.stdout.on('data', d => salida += d);
   p.stderr.on('data', d => error += d);
@@ -94,7 +104,9 @@ const r3 = await correr([bueno, '--json']);
 let datos = null;
 try { datos = JSON.parse(r3.salida); } catch { /* se reporta abajo */ }
 ok('la salida es JSON válido', datos !== null);
-ok('trae un paso por petición con sus aserciones', datos?.pasos?.length === 2 && datos.pasos[1].aserciones.length === 2);
+ok('trae un paso por petición con sus aserciones', datos?.pasos?.length === 2 && datos.pasos[1].aserciones.length === 5);
+ok('las aserciones sobre cabeceras y tiempo pasan', datos?.pasos?.[1]?.aserciones?.every(a => a.pasa === true) === true,
+   (datos?.pasos?.[1]?.aserciones ?? []).filter(a => !a.pasa).map(a => a.asercion?.crudo ?? '?').join(' | '));
 ok('cada aserción dice si pasa', datos?.pasos?.[0]?.aserciones?.every(a => a.pasa === true) === true);
 
 console.log(BR + '== variables desde la línea de órdenes');

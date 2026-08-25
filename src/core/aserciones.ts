@@ -8,7 +8,7 @@
  *
  *   # @assert status == 200
  *   # @assert body.$.token exists
- *   # @assert headers.content-type contains json
+ *   # @assert headers.content-type contains json   (o `header.`, da igual)
  *   # @assert time < 2000
  */
 
@@ -36,6 +36,9 @@ export interface RespuestaComprobable {
 
 const LINEA = /^[ \t]*(?:#|\/\/)[ \t]*@assert[ \t]+(.+?)[ \t]*$/gm;
 const PARTES = /^(\S+)[ \t]+(==|!=|<|>|contains|matches|exists)[ \t]*(.*)$/;
+// Escribir `header.` en singular es lo normal: la cabecera es una. Se aceptan
+// las dos formas antes que dejar fallar una asercion por una `s`.
+const PREFIJOS_CABECERA = ['headers.', 'header.'];
 
 export function leerAserciones(bloque: string): Asercion[] {
     const fuera: Asercion[] = [];
@@ -63,8 +66,9 @@ export function valorDe(sujeto: string, r: RespuestaComprobable): string {
     if (sujeto === 'time') {
         return String(r.ms);
     }
-    if (sujeto.startsWith('headers.')) {
-        const nombre = sujeto.slice('headers.'.length).toLowerCase();
+    const prefijoCabecera = PREFIJOS_CABECERA.find(pre => sujeto.startsWith(pre));
+    if (prefijoCabecera) {
+        const nombre = sujeto.slice(prefijoCabecera.length).toLowerCase();
         const cabeceras = r.cabeceras ?? {};
         const clave = Object.keys(cabeceras).find(k => k.toLowerCase() === nombre);
         return clave ? String(cabeceras[clave] ?? '') : '';
@@ -106,8 +110,25 @@ function porRuta(cuerpo: string | undefined, ruta: string): string {
     return typeof actual === 'string' ? actual : JSON.stringify(actual);
 }
 
+/**
+ * ¿Es un sujeto que sabemos resolver? Un `header.content-tipe` mal escrito
+ * valía '' y la aserción fallaba como si el servidor tuviera la culpa; peor
+ * todavía con `!=`, donde pasaba y el fichero parecía verde.
+ */
+export function sujetoConocido(sujeto: string): boolean {
+    return sujeto === 'status'
+        || sujeto === 'time'
+        || sujeto === 'body'
+        || sujeto === 'body.*'
+        || sujeto.startsWith('body.$')
+        || PREFIJOS_CABECERA.some(pre => sujeto.startsWith(pre) && sujeto.length > pre.length);
+}
+
 export function comprobar(aserciones: Asercion[], r: RespuestaComprobable): Resultado[] {
     return aserciones.map(a => {
+        if (!sujetoConocido(a.sujeto)) {
+            return { asercion: a, pasa: false, obtenido: `no sé qué es "${a.sujeto}"` };
+        }
         const obtenido = valorDe(a.sujeto, r);
         const e = a.esperado;
         let pasa: boolean;

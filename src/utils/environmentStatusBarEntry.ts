@@ -1,4 +1,4 @@
-import { languages, StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { l10n, languages, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { getCurrentTextDocument } from './workspaceUtility';
 
 export class EnvironmentStatusEntry {
@@ -8,8 +8,8 @@ export class EnvironmentStatusEntry {
         this.environmentEntry = window.createStatusBarItem('environment', StatusBarAlignment.Right, 100);
         this.environmentEntry.command = 'httpkeeper.switch-environment';
         this.environmentEntry.text = environment;
-        this.environmentEntry.tooltip = 'Switch REST Client Environment';
-        this.environmentEntry.name = 'REST Client Environment';
+        this.environmentEntry.tooltip = l10n.t('Switch HttpKeeper environment');
+        this.environmentEntry.name = l10n.t('HttpKeeper environment');
         this.environmentEntry.show();
 
         window.onDidChangeActiveTextEditor(this.showHideStatusBar, this);

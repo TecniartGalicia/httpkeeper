@@ -1,6 +1,6 @@
 import { createScanner, SyntaxKind } from 'jsonc-parser';
 import * as os from 'os';
-import { window } from 'vscode';
+import { l10n, window } from 'vscode';
 import { MimeUtility } from './mimeUtility';
 import { isJSONString } from './misc';
 const pd = require('pretty-data').pd;
@@ -25,7 +25,7 @@ export class ResponseFormatUtility {
                 if (isJSONString(body)) {
                     body = this.jsonPrettify(body);
                 } else if (body && !suppressValidation) {
-                    window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
+                    window.showWarningMessage(l10n.t('The content type of response is application/json, while response body is not a valid json string'));
                 }
             } else if (MimeUtility.isXml(contentType)) {
                 body = pd.xml(body);

@@ -3,7 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
 import { EOL, tmpdir } from 'os';
 import * as path from 'path';
-import { QuickPickItem, window, workspace } from 'vscode';
+import { l10n, QuickPickItem, window, workspace } from 'vscode';
 import { HistoricalHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
 import { formatHeaders } from '../utils/misc';
@@ -21,7 +21,7 @@ export class HistoryController {
     public async save() {
         const requests = await UserDataManager.getRequestHistory();
         if (requests.length === 0) {
-            window.showInformationMessage("No request history items are found!");
+            window.showInformationMessage(l10n.t('No request history items are found!'));
             return;
         }
 
@@ -31,7 +31,7 @@ export class HistoryController {
                 rawRequest: request
             };
             if (typeof request.body === 'string' && request.body.length > 0) {
-                item.description = `${request.body.length} body bytes`;
+                item.description = l10n.t('{0} body bytes', request.body.length);
             }
             if (request.startTime) {
                 item.detail = `${dayjs().to(request.startTime)}`;
@@ -39,7 +39,7 @@ export class HistoryController {
             return item;
         });
 
-        const item = await window.showQuickPick(itemPickList, { placeHolder: "" });
+        const item = await window.showQuickPick(itemPickList, { placeHolder: l10n.t('Pick a request to reopen') });
         if (!item) {
             return;
         }
@@ -51,12 +51,12 @@ export class HistoryController {
     @trace('Clear History')
     public async clear() {
         const btn = await window.showInformationMessage(
-            'Do you really want to clear request history?',
-            { title: 'Yes' },
-            { title: 'No' });
-        if (btn?.title === 'Yes') {
+            l10n.t('Do you really want to clear request history?'),
+            { title: l10n.t('Yes') },
+            { title: l10n.t('No') });
+        if (btn?.title === l10n.t('Yes')) {
             await UserDataManager.clearRequestHistory();
-            window.showInformationMessage('Request history has been cleared');
+            window.showInformationMessage(l10n.t('Request history has been cleared'));
         }
     }
 

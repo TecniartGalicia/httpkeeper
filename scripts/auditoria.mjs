@@ -10,9 +10,10 @@ const ok = (n, c, extra = '') => {
   if (!c) fallos++;
 };
 const seccion = (t) => console.log(`\n== ${t}`);
-const correr = (cmd) => {
+const correr = (cmd, env) => {
+  const opciones = { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ...env } };
   try {
-    return { salida: execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }), codigo: 0 };
+    return { salida: execSync(cmd, opciones), codigo: 0 };
   } catch (e) {
     return { salida: (e.stdout ?? '') + (e.stderr ?? ''), codigo: e.status ?? 1 };
   }
@@ -28,7 +29,7 @@ ok('se publica gratis', pkg.pricing === 'Free');
 ok('no se activa en todo arranque', !(pkg.activationEvents ?? []).includes('*'), `eventos: ${JSON.stringify(pkg.activationEvents)}`);
 ok('sigue aportando el lenguaje http', pkg.contributes.languages?.some((l) => l.id === 'http'));
 ok('los comandos son propios', Object.keys(pkg.contributes.commands).length > 0 && pkg.contributes.commands.every((c) => c.command.startsWith('httpkeeper.')));
-ok('el runner se publica como binario', pkg.bin?.httpkeeper !== undefined);
+ok('el runner se publica como binario', pkg.bin?.httpkeeper !== undefined, pkg.bin?.httpkeeper);
 
 seccion('crédito al autor original (es MIT, pero se dice)');
 const readme = leer('README.md');
@@ -67,6 +68,66 @@ if (compilado) {
   ok('el runner no empaqueta controladores del editor', !cargados.some((f) => String(f).includes('controllers')), cargados.length + ' ficheros');
 }
 
+seccion('los recursos que pide el codigo existen y viajan');
+// Tres fallos reales salieron de aqui: un css renombrado a medias, el js del
+// webview excluido del paquete y un icono heredado que ya no existia. Ninguno
+// rompe la compilacion; se ven al abrir la pestana de respuesta ya instalada.
+const recursos = [...leer('src/views/baseWebview.ts').matchAll(/asAbsolutePath\(path\.join\('([^']+)', '([^']+)'\)\)/g)]
+    .map((m) => `${m[1]}/${m[2]}`);
+ok('el codigo pide recursos por ruta', recursos.length > 0, recursos.join(', '));
+for (const r of recursos) {
+    ok(`existe ${r}`, fs.existsSync(r));
+}
+
+seccion('el cambio de nombre no dejo cabos sueltos');
+// El fork renombro comandos y ajustes. Lo que se quedo a medias no rompe la
+// compilacion: el enlace de un documento llamaba a `rest-client._openDocumentLink`
+// y, con REST Client instalado, se lo abria la otra extension.
+const fuentes = correr('git ls-files src').salida.split(/\r?\n/).filter((f) => f.endsWith('.ts') && !f.startsWith('src/test'));
+const registrados = new Set([...leer('package.json').matchAll(/"command":\s*"([^"]+)"/g)].map((m) => m[1]));
+for (const f of fuentes) {
+    for (const m of leer(f).matchAll(/registerCommand\('([^']+)'/g)) registrados.add(m[1]);
+}
+const invocados = new Set();
+for (const f of fuentes) {
+    for (const m of leer(f).matchAll(/command:([a-z0-9-]+\.[A-Za-z0-9._-]+)/g)) invocados.add(m[1]);
+}
+const huerfanos = [...invocados].filter((c) => !registrados.has(c));
+ok('todo comando invocado por enlace existe', huerfanos.length === 0, huerfanos.join(', '));
+
+// Solo se miran las cadenas con guion: los identificadores internos
+// (RestClientSettings y compania) se dejan como estan para que los parches del
+// proyecto original sigan aplicando sin ruido.
+// Los dos sitios donde `rest-client` sigue siendo lo correcto: los ajustes que
+// se heredan y la carpeta de datos que se comparte a proposito.
+const restosPermitidos = ['src/utils/configuracionHeredada.ts', 'src/utils/userDataManager.ts'];
+const restos = fuentes.filter((f) => !restosPermitidos.includes(f) && /rest-client|vscode-restclient/.test(leer(f)));
+ok('sin restos del nombre viejo fuera de donde toca', restos.length === 0, restos.join(', '));
+
+seccion('las dos lenguas estan completas');
+const l10n = correr('node scripts/comprobar-l10n.mjs');
+ok('ingles y castellano sin huecos', l10n.codigo === 0, /=+ (\d+) fallos/.exec(l10n.salida)?.[1] + ' fallos');
+
+seccion('el paquete lleva lo que promete y nada mas');
+const empaquetados = correr('npx vsce ls --no-dependencies').salida.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+const enPaquete = (f) => empaquetados.includes(f);
+ok('el bundle del runner viaja en el paquete', enPaquete('dist/cli.js'));
+ok('el binario declarado es el que viaja', enPaquete(pkg.bin.httpkeeper.replace('./', '')));
+ok('los dos idiomas viajan', enPaquete('package.nls.json') && enPaquete('package.nls.es.json'));
+for (const r of recursos) {
+    ok(`${r} viaja en el paquete`, enPaquete(r));
+}
+ok('sin codigo fuente dentro', !empaquetados.some((f) => f.startsWith('src/')));
+ok('sin mapas de codigo dentro', !empaquetados.some((f) => f.endsWith('.map')));
+ok('sin los documentos internos dentro', !empaquetados.some((f) => f.startsWith('docs/') || f.startsWith('scripts/')));
+if (fs.existsSync('dist/cli.js')) {
+  const cli = leer('dist/cli.js');
+  ok('el runner publicado arranca solo (shebang)', cli.startsWith('#!/usr/bin/env node'));
+  ok('el runner publicado no carga el editor', !cli.includes('require("vscode")'));
+  const r = correr('node dist/cli.js');
+  ok('el runner publicado explica su uso', r.codigo === 2 && r.salida.includes('uso:'));
+}
+
 seccion('compila y pasa las pruebas');
 ok('el código compila', correr('npx tsc -p ./ --noEmit --skipLibCheck').codigo === 0);
 ok('el runner compila', correr('npx tsc -p tsconfig.cli.json --noEmit').codigo === 0);
@@ -75,6 +136,8 @@ const nUnit = /(\d+) passing/.exec(unit.salida)?.[1] ?? '0';
 ok('pruebas unitarias en verde', unit.codigo === 0 && Number(nUnit) >= 15, `${nUnit} pruebas`);
 const cli = correr('node scripts/probar-cli.mjs');
 ok('el runner pasa su prueba de punta a punta', cli.codigo === 0, /(\d+) fallos/.exec(cli.salida)?.[0] ?? '');
+const cliPub = correr('node scripts/probar-cli.mjs', { CLI_RUTA: 'dist/cli.js' });
+ok('el runner publicado pasa la misma prueba', cliPub.codigo === 0, /(\d+) fallos/.exec(cliPub.salida)?.[0] ?? '');
 
 seccion('compatibilidad con REST Client');
 const ajustes = leer('src/utils/configuracionHeredada.ts');
@@ -84,7 +147,17 @@ const troceo = leer('src/core/secuencia.ts');
 ok('el troceo por ### se comporta como el original', troceo.includes('getDelimiterRows'));
 
 seccion('promesas del README');
-ok('promete 36 pruebas y existen', readme.includes('**36**'), `${nUnit} unitarias + 21 de integración`);
+// El numero de pruebas es lo primero que se queda viejo en un README, y aqui
+// es ademas el argumento central del fork. Se cuenta, no se cree.
+const cuentaIts = (dir) => fs.readdirSync(dir, { recursive: true })
+    .filter((f) => String(f).endsWith('.test.ts'))
+    .reduce((n, f) => n + (leer(path.join(dir, String(f))).match(/\bit\(/g)?.length ?? 0), 0);
+const nPruebas = cuentaIts('src/test/unit') + cuentaIts('src/test/integration');
+for (const f of ['README.md', 'README.es.md']) {
+    const prometido = /\*\*(\d+)\*\*\s*\(/.exec(leer(f))?.[1];
+    ok(`${f} promete el numero de pruebas que hay`, Number(prometido) === nPruebas, `dice ${prometido}, hay ${nPruebas}`);
+}
+ok('las unitarias que corren son las que estan escritas', Number(nUnit) === cuentaIts('src/test/unit'), `${nUnit} corriendo`);
 ok('promete 399 paquetes', readme.includes('399'));
 ok('promete cero telemetría', readme.toLowerCase().includes('none'));
 

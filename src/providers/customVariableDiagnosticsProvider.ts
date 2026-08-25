@@ -1,4 +1,4 @@
-import { ConfigurationChangeEvent, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, languages, Position, Range, TextDocument, workspace } from 'vscode';
+import { ConfigurationChangeEvent, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, l10n, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import * as Constants from '../common/constants';
 import { EnvironmentController } from '../controllers/environmentController';
 import { DocumentCache } from '../models/documentCache';
@@ -8,6 +8,7 @@ import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { Selector } from '../utils/selector';
+import { SECCION, SECCION_HEREDADA } from '../utils/configuracionHeredada';
 
 import { VariableProcessor } from "../utils/variableProcessor";
 
@@ -55,7 +56,9 @@ export class CustomVariableDiagnosticsProvider {
 
     private queueAll(event?: ConfigurationChangeEvent) {
         workspace.textDocuments
-            .filter(document => event === undefined || event.affectsConfiguration('rest-client', document.uri))
+            .filter(document => event === undefined
+                || event.affectsConfiguration(SECCION, document.uri)
+                || event.affectsConfiguration(SECCION_HEREDADA, document.uri))
             .forEach(document => this.queue(document));
     }
 
@@ -99,7 +102,7 @@ export class CustomVariableDiagnosticsProvider {
                         .filter(variable => !this.hasPromptVariableDefintion(promptVariableDefinitions, variable))
                         .forEach(({ name, begin, end }) => {
                             diagnostics.push(
-                                new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
+                                new Diagnostic(new Range(begin, end), l10n.t('{0} is not found', name), DiagnosticSeverity.Error));
 
                         });
                 });
@@ -113,7 +116,7 @@ export class CustomVariableDiagnosticsProvider {
                 .forEach(([, variables]) => {
                     variables.forEach(({ name, begin, end }) => {
                         diagnostics.push(
-                            new Diagnostic(new Range(begin, end), `Request '${name}' has not been sent`, DiagnosticSeverity.Information));
+                            new Diagnostic(new Range(begin, end), l10n.t("Request '{0}' has not been sent", name), DiagnosticSeverity.Information));
                     });
                 });
 

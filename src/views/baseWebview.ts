@@ -26,8 +26,8 @@ export abstract class BaseWebview {
         this.baseFilePath = Uri.file(this.context.asAbsolutePath(path.join('styles', 'reset.css')));
         this.vscodeStyleFilePath = Uri.file(this.context.asAbsolutePath(path.join('styles', 'vscode.css')));
         this.customStyleFilePath = Uri.file(this.context.asAbsolutePath(path.join('styles', 'httpkeeper.css')));
-        this.scriptFilePath = Uri.file(this.context.asAbsolutePath(path.join('scripts', 'main.js')));
-        this.iconFilePath = Uri.file(this.context.asAbsolutePath(path.join('images', 'rest_icon.png')));
+        this.scriptFilePath = Uri.file(this.context.asAbsolutePath(path.join('webview', 'main.js')));
+        this.iconFilePath = Uri.file(this.context.asAbsolutePath(path.join('images', 'icon.png')));
     }
 
     public get onDidCloseAllWebviewPanels(): Event<void> {

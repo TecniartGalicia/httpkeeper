@@ -1,4 +1,4 @@
-import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
+import { ExtensionContext, l10n, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
 import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
@@ -47,9 +47,12 @@ export class RequestController {
         const name = metadatas.get(RequestMetadata.Name);
 
         if (metadatas.has(RequestMetadata.Note)) {
-            const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
-            const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
-            if (userConfirmed !== 'Yes') {
+            const note = name
+                ? l10n.t('Are you sure you want to send the request "{0}"?', name)
+                : l10n.t('Are you sure you want to send this request?');
+            const si = l10n.t('Yes');
+            const userConfirmed = await window.showWarningMessage(note, si, l10n.t('No'));
+            if (userConfirmed !== si) {
                 return;
             }
         }
@@ -85,7 +88,7 @@ export class RequestController {
         try {
             await this._httpClient.clearCookies();
         } catch (error) {
-            window.showErrorMessage(`Error clearing cookies:${error?.message}`);
+            window.showErrorMessage(l10n.t('Error clearing cookies: {0}', error?.message));
         }
     }
 

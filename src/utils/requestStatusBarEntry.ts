@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { l10n, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
 
 const filesize = require('filesize');
@@ -50,17 +50,17 @@ export class RequestStatusEntry {
                 break;
 
             case RequestState.Pending:
-                this.showDurationEntry('$(sync~spin) Waiting...', 'Click to cancel', 'httpkeeper.cancel-request');
+                this.showDurationEntry(`$(sync~spin) ${l10n.t('Waiting...')}`, l10n.t('Click to cancel'), 'httpkeeper.cancel-request');
                 break;
 
             case RequestState.Cancelled:
-                this.showDurationEntry('$(circle-slash) Cancelled');
+                this.showDurationEntry(`$(circle-slash) ${l10n.t('Cancelled')}`);
                 break;
 
             case RequestState.Received:
                 const response = status.response;
                 const tooltip = [
-                    'Breakdown of Duration:',
+                    l10n.t('Breakdown of Duration:'),
                     `Socket: ${response.timingPhases.wait?.toFixed(1) ?? 0}ms`,
                     `DNS: ${response.timingPhases.dns?.toFixed(1) ?? 0}ms`,
                     `TCP: ${response.timingPhases.tcp?.toFixed(1) ?? 0}ms`,
@@ -78,7 +78,7 @@ export class RequestStatusEntry {
     private showSizeEntry(response: HttpResponse) {
         this.sizeEntry.text = `$(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
         this.sizeEntry.tooltip = [
-            'Breakdown of Response Size:',
+            l10n.t('Breakdown of Response Size:'),
             `Headers: ${filesize(response.headersSizeInBytes)}`,
             `Body: ${filesize(response.bodySizeInBytes)}`
         ].join(EOL);
