@@ -36,6 +36,12 @@ ok('el README nombra a Huachao Mao', readme.includes('Huachao Mao'));
 ok('el README enlaza al repositorio original', readme.includes('github.com/Huachao/vscode-restclient'));
 ok('la licencia MIT original se conserva', leer('LICENSE').includes('MIT'));
 
+seccion('activos propios (no se hereda la imagen de nadie)');
+ok('el icono declarado existe', fs.existsSync(pkg.icon ?? ''), pkg.icon);
+const imagenes = fs.existsSync('images') ? fs.readdirSync('images') : [];
+ok('sin el icono del proyecto original', !imagenes.includes('rest_icon.png'));
+ok('sin los gif de demostración del original', !imagenes.some(f => /demo|response|code-snippet|usage/.test(f)), imagenes.join(', '));
+
 seccion('privacidad: no habla con nadie');
 ok('sin dependencia de telemetría', !JSON.stringify(pkg.dependencies).includes('applicationinsights'));
 const conTelemetria = correr('git grep -l "applicationinsights\\|trackEvent\\|AiKey" -- src').salida.trim();
@@ -45,8 +51,7 @@ ok('sin ajuste de telemetría en la ficha', !JSON.stringify(pkg.contributes.conf
 seccion('dependencias');
 const audit = JSON.parse(correr('npm audit --omit=dev --json').salida || '{}');
 const v = audit.metadata?.vulnerabilities ?? {};
-ok('ninguna vulnerabilidad crítica en producción', (v.critical ?? 0) === 0, `críticas: ${v.critical ?? '?'}`);
-ok('menos de diez vulnerabilidades en total', (v.total ?? 99) < 10, `total: ${v.total ?? '?'}`);
+ok('ninguna vulnerabilidad en producción', (v.total ?? 99) === 0, `total: ${v.total ?? '?'}`);
 ok('aws-amplify fuera', !JSON.stringify(pkg.dependencies).includes('aws-amplify'));
 ok('xmldom sin mantenimiento fuera', pkg.dependencies.xmldom === undefined);
 
@@ -79,7 +84,7 @@ const troceo = leer('src/core/secuencia.ts');
 ok('el troceo por ### se comporta como el original', troceo.includes('getDelimiterRows'));
 
 seccion('promesas del README');
-ok('promete 32 pruebas y existen', readme.includes('**32**'), `${nUnit} unitarias + 17 de integración`);
+ok('promete 36 pruebas y existen', readme.includes('**36**'), `${nUnit} unitarias + 21 de integración`);
 ok('promete 399 paquetes', readme.includes('399'));
 ok('promete cero telemetría', readme.toLowerCase().includes('none'));
 

@@ -12,14 +12,18 @@ So the first thing this fork shipped was not a feature. It was the net.
 
 | | Original | HttpKeeper |
 |---|---|---|
-| Tests | 0 | **32** (15 unit, 17 integration with real requests) |
-| Vulnerabilities in production deps | 75 (6 critical) | **5**, none critical |
+| Tests | 0 | **36** (15 unit, 21 integration with real requests) |
+| Vulnerabilities in production deps | 75 (6 critical) | **0** |
 | Packages | 1,487 | **399** |
 | Telemetry | Application Insights | **none** |
 
 `aws-amplify` — the whole AWS SDK, GraphQL, DataStore, ML predictions and all — was being pulled in for a Cognito login. It is now sixty lines that talk to Cognito over HTTP: **1,088 packages gone**.
 
 ## What you get on top
+
+And three bugs its users have been reporting for years: the response not showing up **in Cursor**, a re-sent request carrying mangled headers, and a JSONPath with several matches quietly returning just the first one.
+
+Two other pull requests were **rejected** after testing them: one that claimed to fix IPv6 and broke `localhost` instead, and the most upvoted of the lot — it ran shell commands straight from the `.http` file.
 
 Three things the original's users have been asking for since 2018, each with the votes to prove it:
 

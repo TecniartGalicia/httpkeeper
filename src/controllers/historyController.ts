@@ -11,7 +11,7 @@ import { UserDataManager } from '../utils/userDataManager';
 
 dayjs.extend(relativeTime);
 
-const uuidv4 = require('uuid/v4');
+import { v4 as uuidv4 } from 'uuid';
 
 export class HistoryController {
     public constructor() {
@@ -72,7 +72,7 @@ export class HistoryController {
     }
 
     private async createTempFile(): Promise<string> {
-        const file = path.join(tmpdir(), `vscode-restclient-${uuidv4()}.http`);
+        const file = path.join(tmpdir(), `httpkeeper-${uuidv4()}.http`);
         await fs.ensureFile(file);
         return file;
     }
