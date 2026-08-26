@@ -215,4 +215,5 @@ Aviso: cuentas de Reddit nuevas caen en AutoModerator (nos pasó con r/ClaudeAI)
 
 | Fecha | Canal | Enlace | Resultado |
 |---|---|---|---|
-| | | | |
+| 2026-08-26 17:48 UTC | B · comentario en #1394 | https://github.com/Huachao/vscode-restclient/issues/1394#issuecomment-5428966037 | publicado; sin respuesta aún |
+| pendiente | A · incidencia al autor | | |
