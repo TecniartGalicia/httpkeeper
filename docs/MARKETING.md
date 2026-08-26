@@ -12,6 +12,7 @@ Fecha: 2026-08-26 (día de publicación). Todo lo de aquí lo redacto yo y lo pu
 | Búsqueda «rest client» | fuera del top 50 |
 | Búsqueda «http client» | fuera del top 50 |
 | Búsqueda «.http» | puesto 22 |
+| Otro fork | `tutilus.rest-client-next` (feb. 2026): 30 instalaciones, 2 estrellas; se le ofrece unir fuerzas |
 
 **El problema es de descubrimiento, no de producto.** El ranking del Marketplace pesa instalaciones y valoración; una extensión nueva con cero de ambas no aparece por mucho que sea la respuesta a la búsqueda. Las primeras instalaciones tienen que venir de fuera de la tienda; a partir de unos cientos, la propia búsqueda empieza a traer las siguientes. El plan entero es conseguir ese arranque sin quemar la reputación.
 
@@ -84,7 +85,9 @@ Si a los 30 días no llegamos a 300 instalaciones, el problema no es de canales:
 
 ### A · Incidencia de cortesía al autor (repositorio Huachao/vscode-restclient)
 
-**Título:** A maintained fork exists: HttpKeeper — with credit, MIT kept, changes offered back
+**Título:** A maintained fork exists: HttpKeeper - credit kept, MIT kept, changes offered back
+
+Texto en `docs/textos/A-incidencia-autor.md`; la URL prerrellenada, en `docs/textos/A-url.txt`.
 
 > Hi Huachao,
 >
@@ -92,19 +95,30 @@ Si a los 30 días no llegamos a 300 instalaciones, el problema no es de canales:
 >
 > Since there has been no release since June 2022 and 61 pull requests are waiting, I have published a maintained fork: **HttpKeeper** (https://github.com/TecniartGalicia/httpkeeper). Your copyright notice and the MIT license are intact, your name is in the README and in `contributors`, and the full git history is preserved.
 >
-> What it adds so far: a test suite (37 tests, the original had none), 0 vulnerabilities in production dependencies (from 75), telemetry removed, three of the open PRs merged after testing them (#1440, #1432, #853), and the three most-voted requests since 2018 implemented (#267 assertions, #724 sequential runs, #432 a CLI runner). Two PRs were rejected with reasons written down (#1396, #532).
+> What it adds so far: a test suite (37 tests; the original had none), 0 vulnerabilities in production dependencies (from 75), telemetry removed, three of the open PRs merged after testing them (#1440, #1432, #853), and the three most-voted requests since 2018 implemented (#267 assertions, #724 sequential runs, #432 a CLI runner). Two PRs were rejected with the reasons written down (#1396, #532).
 >
-> Everything is offered back. If you would rather merge any of it here, or if you come back to the project, I will happily help with that instead — a fork is the second-best outcome.
+> I know @tutilus also maintains rest-client-next; I have offered in #1394 to join forces rather than split the users.
 >
-> If you would prefer a different name, or that the fork not mention REST Client the way it does, tell me and I will change it.
+> Everything is offered back. If you would rather merge any of it here, or if you come back to the project, I will happily help with that instead - a fork is the second-best outcome. And if you would prefer a different name, or that the fork not mention REST Client the way it does, tell me and I will change it.
 
 ### B · Comentario en #1394 («This is DEAD. Ask for new maintainers»)
 
-> For anyone still following this thread: I have published a maintained fork, **HttpKeeper** (https://github.com/TecniartGalicia/httpkeeper — on the Marketplace and Open VSX as `argalla.httpkeeper`).
+Ojo: en ese hilo ya hay otro fork anunciado (`tutilus.rest-client-next`, feb. 2026, 30 instalaciones, «unos PRs y dependencias al día») y alguien pidió una organización conjunta. El texto lo reconoce y ofrece unir fuerzas: es lo honesto y lo que mejor lee ese hilo. Texto en `docs/textos/B-comentario-1394.md`.
+
+> Another maintained fork, for anyone weighing options in this thread: **HttpKeeper** (https://github.com/TecniartGalicia/httpkeeper - `argalla.httpkeeper` on the Marketplace and on Open VSX, so it installs in Cursor and VSCodium too).
 >
-> Same `.http` format, same settings (`rest-client.*` is still read), same history and cookies folder — nothing to migrate. What changed: a test suite (the original had none, which is why nobody could merge the 61 PRs safely), 0 vulnerabilities in production dependencies, no telemetry, the Cursor fix (#1434), and the three most-requested features from this tracker (#267, #724, #432).
+> @tutilus's rest-client-next and this one started from the same place, and I would rather join forces than split the users. @marcellourbani's organisation idea is the right one; I am in if you both are.
 >
-> All of Huachao's credit and license are kept, and every change is offered back here. I opened a note to him about it. If he returns, great — that is the better outcome.
+> What HttpKeeper has done so far, in case it is useful to either fork:
+>
+> - A test suite: 37 tests against a real local server. The original had none, which is why the 61 open PRs were never safe to merge.
+> - Production dependencies at 0 vulnerabilities (from 75). `aws-amplify` - the whole AWS SDK - was pulled in for a Cognito login; it is now a small HTTP client, 1,088 packages gone. Telemetry removed.
+> - PRs #1440 (the Cursor fix, #1434), #1432 and #853 merged after testing them; #1396 and #532 rejected, with the reasons written down.
+> - The three most-voted requests here implemented: #267 assertions in the file, #724 / #444 running a whole file in order with chained variables, and #432 a CLI runner with exit codes for CI.
+>
+> Same `.http` format, `rest-client.*` settings still read, same `~/.rest-client` folder: switching in either direction costs nothing.
+>
+> Huachao's copyright and MIT license are kept, and everything is offered back upstream.
 
 ### C · Comentario en #1434 («Experiencing Issue on Cursor»)
 
