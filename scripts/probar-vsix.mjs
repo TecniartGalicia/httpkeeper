@@ -25,8 +25,12 @@ const s = http.createServer((q, r) => {
 });
 s.listen(0, '127.0.0.1', () => console.log(JSON.stringify({ puerto: s.address().port })));`;
 
+// En Windows npx es un .cmd y hay que pasar por el shell, asi que las rutas van
+// entre comillas; en Linux y macOS no hay shell y las comillas irian literales.
+const CON_SHELL = process.platform === 'win32';
+const ruta = (r) => (CON_SHELL ? JSON.stringify(r) : r);
 const correr = (cmd, args, opciones = {}) => {
-    const r = cp.spawnSync(cmd, args, { encoding: 'utf8', shell: process.platform === 'win32', ...opciones });
+    const r = cp.spawnSync(cmd, args, { encoding: 'utf8', shell: CON_SHELL, ...opciones });
     if (r.status !== 0) {
         console.error(r.stdout ?? '');
         console.error(r.stderr ?? '');
@@ -40,7 +44,7 @@ async function main() {
 
     const vsix = path.join(os.tmpdir(), `httpkeeper-prueba-${process.pid}.vsix`);
     console.log('empaquetando...');
-    correr('npx', ['vsce', 'package', '--no-dependencies', '-o', JSON.stringify(vsix)], { cwd: RAIZ });
+    correr('npx', ['vsce', 'package', '--no-dependencies', '-o', ruta(vsix)], { cwd: RAIZ });
     console.log(`${(fs.statSync(vsix).size / 1024 / 1024).toFixed(2)} MB`);
 
     const ejecutable = await downloadAndUnzipVSCode();
@@ -50,7 +54,7 @@ async function main() {
     const extensiones = path.join(perfil, 'extensions');
     const datos = path.join(perfil, 'user-data');
     console.log('instalando en un VS Code limpio...');
-    console.log(correr(JSON.stringify(cli), [...argsCli, '--extensions-dir', JSON.stringify(extensiones), '--user-data-dir', JSON.stringify(datos), '--install-extension', JSON.stringify(vsix)]).trim());
+    console.log(correr(ruta(cli), [...argsCli, '--extensions-dir', ruta(extensiones), '--user-data-dir', ruta(datos), '--install-extension', ruta(vsix)]).trim());
 
     const tmpServidor = fs.mkdtempSync(path.join(os.tmpdir(), 'vsix-srv-'));
     fs.writeFileSync(path.join(tmpServidor, 's.cjs'), SERVIDOR);
