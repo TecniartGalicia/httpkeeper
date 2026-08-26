@@ -1,65 +1,46 @@
-# Tus tareas — HttpKeeper 1.0.0
+# Tus tareas — HttpKeeper
 
-Todo lo que se podía hacer sin ti está hecho. Esto es lo que necesita tu mano o tu permiso, en orden.
-
-**Estado:** listo para publicar, **sin publicar**, tal y como pediste.
-
----
-
-## 1. Decir «publica»
-
-En cuanto lo digas, yo hago (por este orden):
-
-1. `git push` del repositorio a `github.com/TecniartGalicia/httpkeeper` (hoy sólo existe en local).
-2. Etiqueta `v1.0.0`.
-3. Marketplace de Visual Studio, Open VSX y publicación de GitHub con el `.vsix`.
-
-Nada de eso está hecho todavía. El repositorio **no existe aún en GitHub**: crearlo es publicar el código, y no lo hago hasta que lo digas.
-
-## 2. Dos secretos en el repositorio (si quieres que publique el CI)
-
-Si prefieres que publique la máquina en vez de yo a mano, el repositorio necesita dos secretos:
-
-| Secreto | De dónde sale |
-|---|---|
-| `VSCE_PAT` | Azure DevOps → token con permiso *Marketplace: Manage* para el editor `argalla` |
-| `OVSX_PAT` | open-vsx.org → *Access Tokens* |
-
-Con ellos puestos, `git tag v1.0.0 && git push --tags` publica en las dos tiendas y adjunta el `.vsix`. El flujo comprueba antes que la etiqueta cuadra con `package.json`, que el crédito a Huachao Mao sigue en el README y en la licencia, y pasa toda la batería. Si una tienda ya tiene esa versión, se la salta en vez de fallar.
-
-Si prefieres que lo haga yo a mano, no hace falta ningún secreto: publico con tu PAT como en las anteriores.
-
-## 3. Mirar la ficha antes de que la vea nadie
-
-- **Capturas**: `media/shots/` — cuatro imágenes y un GIF de 0,27 MB, grabados con la extensión de verdad contra un servidor local. Si alguna no te gusta, `npm run demo` las vuelve a hacer.
-- **Textos**: [README.md](../README.md) (inglés, es el que muestra el Marketplace) y [README.es.md](../README.es.md).
-- Las imágenes de la ficha se sirven desde `raw.githubusercontent.com`, así que **hasta que el repositorio no esté subido, en el Marketplace saldrían rotas**. Por eso el orden es: subir el repo primero, publicar después.
-
-## 4. Redes, cuando esté publicada
-
-Lo redacto yo, lo publicas tú (como siempre). Todavía no hay borradores: los escribo cuando digas, para que hablen de algo que ya se pueda instalar.
-
-Un aviso que sí conviene tener pensado: esto es un fork de un proyecto muy querido con 7,5 millones de instalaciones. El mensaje tiene que ser «recogido y mantenido, con crédito al autor», nunca «mejor que el suyo». En `docs/PRS-REVISADOS.md` está el trabajo hecho sobre sus 61 propuestas, que es el argumento honesto.
-
----
-
-## Lo que ya está hecho (para que no lo repases)
+**Estado (2026-08-26): PUBLICADA.** 1.0.0 está en el Marketplace de Visual Studio, en Open VSX y en GitHub.
 
 | | |
 |---|---|
-| Pruebas | 37 (16 unitarias + 21 de integración contra un servidor real) |
-| Runner de terminal | 11 comprobaciones de punta a punta |
-| El `.vsix` instalado | se instala en un VS Code limpio y se ejercita ahí (`npm run test:vsix`) |
-| Auditoría | 60 comprobaciones, 0 fallos (`npm run audit`) |
-| Vulnerabilidades | 0 en dependencias de producción |
-| Idiomas | inglés y castellano, interfaz completa, comprobado que no falta ni sobra ninguna clave |
-| Icono | propio; ningún activo del proyecto original viaja aquí |
-| Licencia | MIT, con el copyright de Huachao Mao intacto y el nuestro añadido |
-| Paquete | 1,03 MB, 34 ficheros, sin código fuente ni mapas dentro |
+| Marketplace | https://marketplace.visualstudio.com/items?itemName=argalla.httpkeeper |
+| Open VSX | https://open-vsx.org/extension/argalla/httpkeeper |
+| Repositorio | https://github.com/TecniartGalicia/httpkeeper |
+| Instalar | `ext install argalla.httpkeeper` |
 
-Todo eso se vuelve a comprobar de una vez con `npm run check`.
+Los secretos `VSCE_PAT` y `OVSX_PAT` ya están en el repositorio: a partir de ahora **`git tag vX.Y.Z && git push --tags` publica solo** en las dos tiendas y adjunta el `.vsix` a la publicación de GitHub, después de pasar toda la batería en Linux. Si una tienda ya tiene la versión, se la salta.
 
-## Lo que queda pendiente en el producto (no bloquea publicar)
+---
+
+## 1. Redes (lo redacto yo, lo publicas tú)
+
+Todavía no hay borradores. Dime cuándo y los escribo para X, LinkedIn y, si quieres, dev.to y Reddit.
+
+Un aviso que conviene tener pensado: esto es un fork de un proyecto muy querido con 7,5 millones de instalaciones. El mensaje tiene que ser «recogido y mantenido, con crédito al autor», nunca «mejor que el suyo». En `docs/PRS-REVISADOS.md` está el trabajo hecho sobre sus 61 propuestas, que es el argumento honesto.
+
+## 2. Avisar al autor original (opcional, pero elegante)
+
+Un mensaje breve a Huachao Mao —una incidencia en su repositorio o un correo— diciendo que existe el fork, que conserva su crédito y su licencia, y que los cambios se le ofrecen de vuelta. Lo redacto cuando quieras; lo envías tú.
+
+## 3. Mirar la ficha con ojos de cliente
+
+Las capturas y el GIF están en `media/shots/`. Si algo no te convence, `npm run demo` los rehace y una versión nueva (`1.0.1`) actualiza la ficha.
+
+---
+
+## Cumplimiento de copyright (auditado el 2026-08-26)
+
+| Exigencia | Cómo se cumple |
+|---|---|
+| MIT del original: conservar el aviso de copyright y el permiso | `LICENSE` lleva `Copyright (c) 2016 - present Huachao Mao` verbatim y el texto MIT completo; añade el nuestro sin quitar el suyo |
+| Atribución | README (ambos idiomas), CHANGELOG, `contributors` del manifiesto, y los 840 commits del autor original conservados en el historial |
+| Licencias de las dependencias | 171 paquetes de producción: MIT, ISC, BSD-2, BSD-3 y Apache-2.0. Ninguno copyleft ni desconocido |
+| BSD y Apache: reproducir el aviso en la distribución binaria | `THIRD-PARTY-NOTICES.txt` viaja en el `.vsix` con la licencia de cada paquete |
+| Marca | Nombre propio (HttpKeeper), icono propio, «REST Client» sólo para nombrar el original; ningún activo gráfico suyo viaja aquí |
+| Comprobación continua | `npm run audit` falla si cualquiera de las anteriores deja de cumplirse |
+
+## Lo que queda pendiente en el producto (no urgente)
 
 - `adal-node` (Azure AD) está deprecado por Microsoft. Migrarlo no se puede probar sin credenciales de Azure, así que se queda con las versiones parcheadas por `overrides`.
 - Cuatro propuestas del original quedaron por revisar: #1359, #1427, #1336 y #664.
