@@ -37,6 +37,27 @@ ok('el README nombra a Huachao Mao', readme.includes('Huachao Mao'));
 ok('el README enlaza al repositorio original', readme.includes('github.com/Huachao/vscode-restclient'));
 ok('la licencia MIT original se conserva', leer('LICENSE').includes('MIT'));
 
+seccion('copyright: lo que exige cada licencia se cumple');
+const licencia = leer('LICENSE');
+ok('el aviso de copyright original esta verbatim', licencia.includes('Copyright (c) 2016 - present Huachao Mao'));
+ok('el aviso de permiso MIT esta completo', licencia.includes('The above copyright notice and this permission notice shall be included'));
+ok('el manifiesto reconoce al autor original', JSON.stringify(pkg.contributors ?? []).includes('Huachao Mao'));
+ok('la licencia declarada es MIT', pkg.license === 'MIT');
+// BSD y Apache exigen reproducir el aviso en la distribucion binaria; el
+// bundle de webpack solo conserva los comentarios /*! */, asi que ademas viaja
+// un fichero con la licencia de cada paquete de produccion.
+const avisos = fs.existsSync('THIRD-PARTY-NOTICES.txt') ? leer('THIRD-PARTY-NOTICES.txt') : '';
+ok('existe el fichero de avisos de terceros', avisos.length > 0);
+const arbol = JSON.parse(correr('npm ls --omit=dev --all --json').salida || '{}');
+const paquetes = new Set();
+// Sin version = dependencia opcional que npm no instalo; no viaja, no cuenta.
+const recorrerArbol = (nodo) => { for (const [n, v] of Object.entries(nodo?.dependencies ?? {})) { if (v.version) { paquetes.add(`${n}@${v.version}`); recorrerArbol(v); } } };
+recorrerArbol(arbol);
+const sinAviso = [...paquetes].filter((pq) => !avisos.includes(`\n${pq}\n`));
+ok('todo paquete de produccion tiene su aviso', paquetes.size > 0 && sinAviso.length === 0, sinAviso.length ? sinAviso.slice(0, 5).join(', ') : `${paquetes.size} paquetes`);
+const copyleft = [...avisos.matchAll(/^License: (.+)$/gm)].map((m) => m[1]).filter((l) => /GPL|SSPL|UNKNOWN|UNLICENSED|CC-BY-NC|EUPL|OSL/i.test(l));
+ok('ninguna licencia copyleft ni desconocida', copyleft.length === 0, copyleft.join(', '));
+
 seccion('activos propios (no se hereda la imagen de nadie)');
 ok('el icono declarado existe', fs.existsSync(pkg.icon ?? ''), pkg.icon);
 const imagenes = fs.existsSync('images') ? fs.readdirSync('images') : [];
@@ -113,6 +134,7 @@ const empaquetados = correr('npx vsce ls --no-dependencies').salida.split(/\r?\n
 const enPaquete = (f) => empaquetados.includes(f);
 ok('el bundle del runner viaja en el paquete', enPaquete('dist/cli.js'));
 ok('el binario declarado es el que viaja', enPaquete(pkg.bin.httpkeeper.replace('./', '')));
+ok('los avisos de terceros viajan', enPaquete('THIRD-PARTY-NOTICES.txt') && enPaquete('LICENSE'));
 ok('los dos idiomas viajan', enPaquete('package.nls.json') && enPaquete('package.nls.es.json'));
 for (const r of recursos) {
     ok(`${r} viaja en el paquete`, enPaquete(r));

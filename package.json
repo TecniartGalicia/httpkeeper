@@ -5,9 +5,15 @@
     "version": "1.0.0",
     "publisher": "argalla",
     "author": {
-        "name": "Huachao Mao",
-        "email": "huachaomao@gmail.com"
+        "name": "Argalla · Tecniart Galicia, S.L.",
+        "url": "https://github.com/TecniartGalicia"
     },
+    "contributors": [
+        {
+            "name": "Huachao Mao (original author of REST Client)",
+            "url": "https://github.com/Huachao/vscode-restclient"
+        }
+    ],
     "icon": "images/icon.png",
     "galleryBanner": {
         "color": "#0F1A24",

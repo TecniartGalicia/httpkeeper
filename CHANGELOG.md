@@ -3,7 +3,7 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-08-25
+## [1.0.0] - 2026-08-26
 
 First release of HttpKeeper, a maintained fork of [REST Client](https://github.com/Huachao/vscode-restclient) 0.25.1 by Huachao Mao (MIT), which has had no release since June 2022.
 
@@ -33,6 +33,7 @@ Everything REST Client did still works, with the same `.http` format and the sam
 - **Zero vulnerabilities** in production dependencies, down from 75 (6 critical, 24 high). `axios` and `form-data` are pinned through overrides because the package that pulls them, `adal-node`, is abandoned by Microsoft; `uuid` moved from 3 to 11.
 - `xmldom` migrated to `@xmldom/xmldom`; `jsonpath-plus` and `httpsnippet` updated.
 - Own icon and identity. No asset from the original project ships here.
+- `THIRD-PARTY-NOTICES.txt` ships in the package with the license of every bundled dependency (171 packages; all MIT, ISC, BSD or Apache-2.0).
 - The default `User-Agent` is now `httpkeeper`.
 - History, cookies and environments are still read from `~/.rest-client`, on purpose, so migrating keeps them. `HTTPKEEPER_HOME` overrides it if you want the two extensions kept apart.
 
