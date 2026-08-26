@@ -12,7 +12,7 @@ Fecha: 2026-08-26 (día de publicación). Todo lo de aquí lo redacto yo y lo pu
 | Búsqueda «rest client» | fuera del top 50 |
 | Búsqueda «http client» | fuera del top 50 |
 | Búsqueda «.http» | puesto 22 |
-| Otro fork | `tutilus.rest-client-next` (feb. 2026): 30 instalaciones, 2 estrellas; se le ofrece unir fuerzas |
+| Otros forks | `tutilus.rest-client-next` (feb. 2026, Marketplace, 30 instalaciones) y `kit1211.rest-client-plus` (jun. 2026, sólo Open VSX, 1.547 descargas; autor del PR #1440 que fusionamos). Somos el único de los tres con pruebas y en las dos tiendas |
 
 **El problema es de descubrimiento, no de producto.** El ranking del Marketplace pesa instalaciones y valoración; una extensión nueva con cero de ambas no aparece por mucho que sea la respuesta a la búsqueda. Las primeras instalaciones tienen que venir de fuera de la tienda; a partir de unos cientos, la propia búsqueda empieza a traer las siguientes. El plan entero es conseguir ese arranque sin quemar la reputación.
 
@@ -122,7 +122,16 @@ Ojo: en ese hilo ya hay otro fork anunciado (`tutilus.rest-client-next`, feb. 20
 
 ### C · Comentario en #1434 («Experiencing Issue on Cursor»)
 
-> This one is fixed in the maintained fork HttpKeeper (https://marketplace.visualstudio.com/items?itemName=argalla.httpkeeper, also on Open VSX for Cursor). The cause was the code assuming `window.activeTextEditor.viewColumn` always exists; in Cursor it can be `undefined`, so nothing happened on Send Request. It is PR #1440 from this repository, merged and covered by an integration test. Same format and settings, so switching is just installing it.
+Ojo: en ese hilo `kit1211` explicó la causa, abrió el PR #1440 (el que fusionamos) y tiene su propio fork, `kit1211.rest-client-plus`, sólo en Open VSX (1.547 descargas). El texto le da las gracias y aporta lo que el suyo no da: Marketplace de VS Code y una prueba de regresión. Texto en `docs/textos/C-comentario-1434.md`.
+
+> Thanks @kit1211 - your PR #1440 is the fix, and it is merged as-is in **HttpKeeper**, another maintained fork of REST Client (https://marketplace.visualstudio.com/items?itemName=argalla.httpkeeper; `argalla.httpkeeper` on Open VSX as well, so it installs from Cursor's extension panel).
+>
+> Two things that may matter to people landing here from a search:
+>
+> - It is on the VS Code Marketplace too, for anyone who needs the fix in VS Code or Windsurf as well as in Cursor.
+> - The fix is covered by an integration test: it sends a real request in an unsplit window and asserts that the response tab appears, so it cannot quietly regress.
+>
+> Same `.http` format, `rest-client.*` settings still read, same `~/.rest-client` folder: nothing to migrate. The original author's credit and MIT license are kept; what else changed (37 tests, 0 vulnerabilities in dependencies, no telemetry) is in the README.
 
 ### D · Comentarios en las incidencias de funciones (uno por incidencia, distinto cada uno)
 
