@@ -13,17 +13,13 @@ Los secretos `VSCE_PAT` y `OVSX_PAT` ya están en el repositorio: a partir de ah
 
 ---
 
-## 1. Redes (lo redacto yo, lo publicas tú)
+## 1. Llegar al público — [MARKETING.md](MARKETING.md)
 
-Todavía no hay borradores. Dime cuándo y los escribo para X, LinkedIn y, si quieres, dev.to y Reddit.
+El plan completo, con calendario y **todos los textos listos para pegar** (A–I): la incidencia de cortesía al autor, los comentarios en las incidencias más votadas del original (#1394 «piden mantenedor», #1434 Cursor, #267, #724, #432), Show HN, hilo de X, LinkedIn, Reddit y el guion del artículo. Lo publicas tú desde tus cuentas; yo redacto y contesto a los comentarios.
 
-Un aviso que conviene tener pensado: esto es un fork de un proyecto muy querido con 7,5 millones de instalaciones. El mensaje tiene que ser «recogido y mantenido, con crédito al autor», nunca «mejor que el suyo». En `docs/PRS-REVISADOS.md` está el trabajo hecho sobre sus 61 propuestas, que es el argumento honesto.
+Orden: hoy A y B; mañana C y D; día 3 E, F y G; día 4 H; día 5 I. Apunta cada uno en la tabla del final del plan.
 
-## 2. Avisar al autor original (opcional, pero elegante)
-
-Un mensaje breve a Huachao Mao —una incidencia en su repositorio o un correo— diciendo que existe el fork, que conserva su crédito y su licencia, y que los cambios se le ofrecen de vuelta. Lo redacto cuando quieras; lo envías tú.
-
-## 3. Mirar la ficha con ojos de cliente
+## 2. Mirar la ficha con ojos de cliente
 
 Las capturas y el GIF están en `media/shots/`. Si algo no te convence, `npm run demo` los rehace y una versión nueva (`1.0.1`) actualiza la ficha.
 
