@@ -720,7 +720,8 @@
         "test:l10n": "node scripts/comprobar-l10n.mjs",
         "test:vsix": "node scripts/probar-vsix.mjs",
         "demo": "node scripts/demo/lanzar.mjs && node scripts/demo/montar.mjs",
-        "build": "webpack --mode production"
+        "build": "webpack --mode production",
+        "vigia": "node scripts/vigia-hilos.mjs"
     },
     "devDependencies": {
         "@types/aws4": "^1.5.1",
