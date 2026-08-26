@@ -33,6 +33,7 @@ jobs:
         run: |
           grep -q "Huachao Mao" README.md || { echo "falta el crédito en el README"; exit 1; }
           grep -q "Huachao Mao" LICENSE   || { echo "falta el copyright original en LICENSE"; exit 1; }
+      - run: npm run build
       - run: npx tsc -p ./ --noEmit --skipLibCheck
       - run: npm run test:unit
       - run: npm run test:l10n

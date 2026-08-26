@@ -24,6 +24,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Build (the integration tests load dist/extension.js)
+        run: npm run build
       - name: Types
         run: npx tsc -p ./ --noEmit --skipLibCheck
       - name: Unit tests

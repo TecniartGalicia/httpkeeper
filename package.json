@@ -711,7 +711,7 @@
         "tslint": "tslint --project tsconfig.json",
         "compile-tests": "tsc -p tsconfig.test.json",
         "test:unit": "npm run compile-tests && mocha \"out-test/test/unit/**/*.test.js\"",
-        "test:integration": "npm run compile-tests && node ./out-test/test/integration/runTest.js",
+        "test:integration": "npm run compile-tests && npm run build && node ./out-test/test/integration/runTest.js",
         "test": "npm run test:unit && npm run test:integration",
         "build:cli": "tsc -p tsconfig.cli.json",
         "test:cli": "npm run build:cli && node scripts/probar-cli.mjs",
@@ -719,7 +719,8 @@
         "check": "npx tsc -p ./ --noEmit --skipLibCheck && npm run test:unit && npm run build:cli && npm run test:cli && npm run test:l10n && npm run audit && npm run test:vsix",
         "test:l10n": "node scripts/comprobar-l10n.mjs",
         "test:vsix": "node scripts/probar-vsix.mjs",
-        "demo": "node scripts/demo/lanzar.mjs && node scripts/demo/montar.mjs"
+        "demo": "node scripts/demo/lanzar.mjs && node scripts/demo/montar.mjs",
+        "build": "webpack --mode production"
     },
     "devDependencies": {
         "@types/aws4": "^1.5.1",
