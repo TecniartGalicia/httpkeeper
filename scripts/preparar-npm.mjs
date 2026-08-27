@@ -18,4 +18,4 @@ pkg.version = version;
 fs.writeFileSync(pkgRuta, JSON.stringify(pkg, null, 2) + '\n');
 fs.copyFileSync(bundle, path.join(RAIZ, 'npm', 'cli.js'));
 fs.copyFileSync(path.join(RAIZ, 'LICENSE'), path.join(RAIZ, 'npm', 'LICENSE'));
-console.log(`npm/ listo: httpkeeper@${version} (${(fs.statSync(bundle).size / 1024).toFixed(0)} KB). Publicar: cd npm && npm publish --access public`);
+console.log(`npm/ listo: ${pkg.name}@${version} (${(fs.statSync(bundle).size / 1024).toFixed(0)} KB). Publicar: cd npm && npm publish --access public`);

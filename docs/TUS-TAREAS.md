@@ -11,20 +11,11 @@
 
 ---
 
-## 1. Publicar el runner en npm (cinco minutos, y necesita tu sesión)
+## 1. npm: hecho, y automatizado
 
-npm exige un inicio de sesión interactivo, así que esto es lo único de la publicación que no puedo hacer yo. El paquete está preparado y probado (`npm pack --dry-run`: 4 ficheros, 12 KB, sin dependencias):
+`httpkeeper-cli@1.1.1` está en npm (`npx httpkeeper-cli api.http`; el comando se llama `httpkeeper`). npm reservaba el nombre `httpkeeper` por parecerse a un `http-keeper` ajeno, de ahí el `-cli`.
 
-```powershell
-cd C:\Users\kirne\Desktop\Apps\restclient-fork
-npm run build
-npm run preparar-npm
-cd npm
-npm login          # abre el navegador; cuenta de npm de Argalla (o créala en npmjs.com)
-npm publish --access public
-```
-
-Con eso funcionan `npx httpkeeper-cli api.http` y la configuración MCP del README (`npx httpkeeper-cli mcp`). La acción de GitHub **no** depende de npm: descarga el runner de la publicación de GitHub.
+Se publicó con un token granular de tu cuenta (`arggallatecnoloxia`, token `httpkeeper-publish`, lectura y escritura en todos los paquetes, bypass 2FA), guardado como `NPM_TOKEN` en `Documents\handsfree-secrets.txt` y como secreto del repositorio: a partir de ahora **cada etiqueta `vX.Y.Z` publica también en npm**. El token **caduca el 25 de noviembre de 2026**: ese día hay que generar otro en npmjs.com → Access Tokens y volver a subirlo (`node ghsecret.mjs NPM_TOKEN` desde `~/handsfree-browser`).
 
 ## 2. Anunciar la 1.1.0 donde la pedían — [MARKETING.md](MARKETING.md)
 
@@ -37,7 +28,7 @@ Cada función nueva cierra incidencias concretas del original. Un comentario dis
 | #279 | `{{$secret}}` |
 | #493 | SSE en vivo en el panel |
 | #173 | `WEBSOCKET` |
-| #432 | `--junit`, npm, acción de GitHub |
+| #432 | `--junit`, `npx httpkeeper-cli`, acción de GitHub |
 
 Y el hilo #1394 (donde ya estamos) merece una línea: «1.1.0 out: JetBrains format, streaming, agents».
 

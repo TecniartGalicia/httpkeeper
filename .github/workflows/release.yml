@@ -3,7 +3,8 @@ name: Release
 # Etiqueta vX.Y.Z sobre main -> comprueba, empaqueta, publica en Marketplace y
 # Open VSX, y adjunta el .vsix a una publicación de GitHub. Repetirlo tras un
 # fallo a medias es seguro: una versión ya publicada se detecta y se salta.
-# Secretos necesarios: VSCE_PAT (Azure DevOps) y OVSX_PAT (open-vsx.org).
+# Secretos necesarios: VSCE_PAT (Azure DevOps), OVSX_PAT (open-vsx.org) y NPM_TOKEN
+# (token granular de npm con bypass 2FA; caduca el 2026-11-25).
 on:
   push:
     tags: ['v*.*.*']
@@ -65,6 +66,20 @@ jobs:
           fi
       - name: El runner suelto, para la acción de GitHub y para npx sin npm
         run: cp dist/cli.js httpkeeper-cli.js
+      - name: npm (se salta si ya está esta versión)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          node scripts/preparar-npm.mjs
+          if npm view "httpkeeper-cli@$VER" version >/dev/null 2>&1; then
+            echo "npm ya tiene $VER"
+          else
+            printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+' > "$RUNNER_TEMP/npmrc"
+            (cd npm && npm publish --access public --userconfig "$RUNNER_TEMP/npmrc")
+            rm -f "$RUNNER_TEMP/npmrc"
+          fi
       - name: Publicación en GitHub
         uses: softprops/action-gh-release@v2
         with:
