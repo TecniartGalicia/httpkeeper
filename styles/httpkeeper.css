@@ -252,3 +252,10 @@ body.vscode-high-contrast #scroll-to-top:hover {
   left: calc(50% - 1.2rem / 2);
   top: calc(50% - 1.2rem / 2);
 }
+/* Cuerpo de un stream (text/event-stream) que va creciendo según llega. */
+.stream {
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+}

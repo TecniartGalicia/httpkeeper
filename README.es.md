@@ -14,28 +14,39 @@ Por eso lo primero que se hizo aquí no fue una función. Fue la red.
 
 | | Original | HttpKeeper |
 |---|---|---|
-| Pruebas | 0 | **37** (16 unitarias, 21 de integración contra un servidor de verdad) |
+| Pruebas | 0 | **52** (24 unitarias, 28 de integración contra un servidor de verdad) |
 | Vulnerabilidades en dependencias | 75 (6 críticas) | **0** |
 | Paquetes | 1.487 | **399** |
 | Telemetría | Application Insights | **ninguna** |
 
 `aws-amplify` —el SDK entero de AWS, con GraphQL, DataStore y predicción automática— entraba para hacer un inicio de sesión de Cognito. Ahora son sesenta líneas que hablan con Cognito por HTTP: **1.088 paquetes menos**.
 
-## Lo que se arregló
+## Lo que se añade
 
-Tres fallos que sus usuarios llevaban años sufriendo: la respuesta que **no aparecía en Cursor**, una petición reenviada que salía con las cabeceras ya manipuladas, y un JSONPath con varios resultados que devolvía solo el primero sin decir nada.
+Tres fallos que sus usuarios llevaban años sufriendo, arreglados: la respuesta que **no aparecía en Cursor**, una petición reenviada que salía con las cabeceras ya manipuladas, y un JSONPath con varios resultados que devolvía solo el primero sin decir nada. Y dos propuestas **rechazadas** después de probarlas: una que decía arreglar IPv6 y lo que hacía era romper `localhost`, y la más votada de todas, que ejecutaba órdenes del sistema tomadas del propio fichero `.http`.
 
-Y dos propuestas **rechazadas** después de probarlas: una que decía arreglar IPv6 y lo que hacía era romper `localhost`, y la más votada de todas, que ejecutaba órdenes del sistema tomadas del propio fichero `.http`.
+Después, lo que la gente pedía desde 2018, cada cosa con sus votos.
 
-## Lo que se añadió
+### El formato de JetBrains, completo (+235 votos)
 
-Tres cosas pedidas desde 2018, cada una con sus votos:
+Los entornos viven junto al fichero, en `http-client.env.json` (compartido) y `http-client.private.env.json` (el tuyo, en `.gitignore`, y manda). Los ficheros se importan entre sí y ejecutan las peticiones de los otros. La respuesta de una petición está disponible en todo fichero que importe al suyo.
 
-**Ejecutar todas las peticiones de un fichero, en orden** (+62 votos). Cada una usa lo que devolvieron las anteriores.
+```http
+import ./lib/auth.http
+
+run #login
+
+###
+GET {{host}}/facturas
+Authorization: Bearer {{login.response.body.$.token}}
+X-Api-Key: {{$secret API_KEY}}
+```
+
+`{{$secret NOMBRE}}` lee el almacén de secretos cifrado del editor: el fichero nunca contiene el valor, así que se puede commitear entero. `{{$uuid}}`, `{{$isoTimestamp}}` y `{{$random.integer(1,10)}}` funcionan como en IntelliJ.
 
 ![El token de una respuesta usado en la petición siguiente](https://raw.githubusercontent.com/TecniartGalicia/httpkeeper/master/media/shots/02-chain.png)
 
-**Comprobaciones escritas en el fichero** (+59 votos), como comentarios `@`, de modo que cualquier otra herramienta que lea el formato las ignore:
+### Ejecutar todas las peticiones de un fichero, en orden (+62), con comprobaciones escritas en el fichero (+59)
 
 ```http
 # @name login
@@ -50,19 +61,49 @@ Content-Type: application/json
 # @assert time < 2000
 ```
 
-**Un ejecutor de terminal** (+44 votos). El mismo fichero, en tu integración continua:
+Las comprobaciones son comentarios `@`, de modo que cualquier otra herramienta que lea el formato las ignora.
+
+### Streaming (+72)
+
+`text/event-stream` —como responde toda API de modelos en 2026— se pinta en el panel **según llega**. Cancelar conserva lo recibido. Se puede comprobar `sse.count`, `sse.first` y `sse.last`.
+
+![Una respuesta SSE creciendo evento a evento](https://raw.githubusercontent.com/TecniartGalicia/httpkeeper/master/media/shots/05-stream.png)
+
+`WEBSOCKET wss://host/socket` con la sintaxis de JetBrains: los mensajes en el cuerpo separados por `===`, `# @timeout 3000` para decir cuánto se escucha, y una transcripción (`>>` enviado, `<<` recibido) como respuesta.
+
+### El cliente HTTP que usan tus agentes
+
+En VS Code, `#httpkeeper` lista las peticiones de un fichero y envía una por su nombre desde el chat de Copilot o cualquier otro participante con modelo de lenguaje; enviar te pregunta antes, y un fichero fuera del espacio de trabajo se rechaza. En VS Code 1.101 o posterior la extensión también anuncia su servidor MCP al modo agente, sin configurar nada.
+
+Fuera del editor, `httpkeeper mcp` es un servidor MCP por stdio para Claude Code, Cursor o cualquier otro que hable MCP: `list_requests`, `send_request`, `run_http_file`. Sólo lee ficheros bajo la raíz con la que arranca y nunca escribe en disco.
+
+```json
+{ "mcpServers": { "httpkeeper": { "command": "npx", "args": ["httpkeeper", "mcp", "--raiz", "."] } } }
+```
+
+### El ejecutor, en todas partes (+44)
 
 ```console
-$ httpkeeper api.http
+$ npx httpkeeper api.http --env dev --secret API_KEY=… --junit informe.xml
   ok   login                200  184 ms
   ok   facturas             200    9 ms
 
 2 peticiones, todo en verde
 ```
 
-![El mismo fichero, ejecutado en la terminal integrada](https://raw.githubusercontent.com/TecniartGalicia/httpkeeper/master/media/shots/04-runner.png)
+Devuelve 0 si todas las comprobaciones pasan y 1 si falla alguna; `--json` para las máquinas y `--junit` para los paneles de pruebas de GitHub y GitLab. El cURL pegado y los cuerpos multiparte con `< fichero` también funcionan en la terminal. En GitHub Actions:
 
-Devuelve 0 si todas las comprobaciones pasan y 1 si falla alguna. Con `--json` para las máquinas. Eso es todo lo que un servidor de integración necesita.
+```yaml
+- uses: TecniartGalicia/httpkeeper@v1
+  with:
+    file: api/smoke.http
+    env: staging
+    junit: httpkeeper.xml
+  env:
+    HTTPKEEPER_SECRET_API_KEY: ${{ secrets.API_KEY }}
+```
+
+![El mismo fichero, ejecutado en la terminal integrada](https://raw.githubusercontent.com/TecniartGalicia/httpkeeper/master/media/shots/04-runner.png)
 
 ## Venir desde REST Client
 
@@ -74,7 +115,7 @@ La interfaz está en castellano y en inglés.
 
 Ni interfaz tipo Postman, ni colecciones en la nube, ni sincronización de equipo, ni cuentas. El producto es un fichero de texto en tu repositorio y así se queda.
 
-El ejecutor de terminal usa su propio lector del formato: método, dirección, cabeceras, cuerpo escrito y cuerpo desde fichero con `< ruta`. El cURL pegado y los formularios multiparte funcionan en el editor, todavía no en la terminal.
+Del formato de JetBrains faltan todavía `run #nombre (@var = valor)` con variables en línea y los scripts `> {% … %}`. WebSocket necesita el `WebSocket` que trae Node 22 o posterior (VS Code lo lleva; un `node` más viejo recibe un mensaje claro).
 
 ## Reconocimiento
 

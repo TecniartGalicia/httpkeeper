@@ -1,7 +1,9 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
+import { commands, ExtensionContext, l10n, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
+import { Secretos } from './utils/secretos';
+import { registrarHerramientas } from './utils/herramientasLm';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
@@ -28,6 +30,7 @@ import { UserDataManager } from './utils/userDataManager';
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
     await UserDataManager.initialize();
+    Secretos.inicializar(context.secrets, context.globalState);
 
     const requestController = new RequestController(context);
     const historyController = new HistoryController();
@@ -45,7 +48,42 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('httpkeeper.clear-history', () => historyController.clear()));
     context.subscriptions.push(commands.registerCommand('httpkeeper.generate-codesnippet', () => codeSnippetController.run()));
     context.subscriptions.push(commands.registerCommand('httpkeeper.copy-request-as-curl', () => codeSnippetController.copyAsCurl()));
-    context.subscriptions.push(commands.registerCommand('httpkeeper.switch-environment', () => environmentController.switchEnvironment()));
+    context.subscriptions.push(commands.registerCommand('httpkeeper.switch-environment', (nombre?: string) => environmentController.switchEnvironment(typeof nombre === 'string' ? nombre : undefined)));
+    // Con argumentos no pregunta nada: lo usan las pruebas y las automatizaciones.
+    context.subscriptions.push(commands.registerCommand('httpkeeper.set-secret', async (nombre?: string, valor?: string) => {
+        if (typeof nombre !== 'string') {
+            nombre = await window.showInputBox({
+                prompt: l10n.t('Secret name (use it as {{$secret NAME}})'),
+                validateInput: v => (Secretos.nombreValido(v) ? undefined : l10n.t('Letters, digits, dots, dashes and underscores only')),
+            });
+        }
+        if (!nombre || !Secretos.nombreValido(nombre)) {
+            return;
+        }
+        if (typeof valor !== 'string') {
+            valor = await window.showInputBox({ prompt: l10n.t('Value for secret "{0}" (stored encrypted, never written to the file)', nombre), password: true, ignoreFocusOut: true });
+        }
+        if (valor === undefined || valor === '') {
+            return;
+        }
+        await Secretos.set(nombre, valor);
+        window.setStatusBarMessage(l10n.t('Secret "{0}" saved', nombre), 4000);
+    }));
+    context.subscriptions.push(commands.registerCommand('httpkeeper.delete-secret', async (nombre?: string) => {
+        if (typeof nombre !== 'string') {
+            const nombres = Secretos.nombres();
+            if (nombres.length === 0) {
+                window.showInformationMessage(l10n.t('There are no secrets stored'));
+                return;
+            }
+            nombre = await window.showQuickPick(nombres, { placeHolder: l10n.t('Secret to delete') });
+        }
+        if (!nombre) {
+            return;
+        }
+        await Secretos.borrar(nombre);
+        window.setStatusBarMessage(l10n.t('Secret "{0}" deleted', nombre), 4000);
+    }));
     context.subscriptions.push(commands.registerCommand('httpkeeper.clear-aad-token-cache', () => AadTokenCache.clear()));
     context.subscriptions.push(commands.registerCommand('httpkeeper.clear-cookies', () => requestController.clearCookies()));
     context.subscriptions.push(commands.registerCommand('httpkeeper._openDocumentLink', args => {
@@ -88,6 +126,8 @@ export async function activate(context: ExtensionContext) {
 
     const diagnosticsProvider = new CustomVariableDiagnosticsProvider();
     context.subscriptions.push(diagnosticsProvider);
+
+    registrarHerramientas(context, requestController);
 }
 
 // this method is called when your extension is deactivated

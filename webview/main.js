@@ -76,6 +76,14 @@
 
   window.addEventListener('message', event => {
     const message = event.data;
+    if (message.command === 'trozo' || message.command === 'fin') {
+      const stream = document.getElementById('stream');
+      if (stream) {
+        stream.appendChild(document.createTextNode(message.command === 'trozo' ? message.texto : '\n-- ' + (message.nota || '')));
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+      return;
+    }
     const code = document.getElementsByTagName('code')[0];
     const [...childs] = code.childNodes;
     // @ts-ignore

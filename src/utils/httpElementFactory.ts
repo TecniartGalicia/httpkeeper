@@ -133,6 +133,31 @@ export class HttpElementFactory {
             new SnippetString(`{{$\${name:${Constants.DotenvVariableName.slice(1)}} \${2:.env variable name}}}`)
         ));
         originalElements.push(new HttpElement(
+            Constants.SecretVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.SecretDescription,
+            new SnippetString(`{{$\${name:${Constants.SecretVariableName.slice(1)}} \${2:SECRET_NAME}}}`)
+        ));
+        originalElements.push(new HttpElement(
+            Constants.UuidVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.UuidDescription,
+            new SnippetString(`{{$\${name:${Constants.UuidVariableName.slice(1)}}}}`)));
+        originalElements.push(new HttpElement(
+            Constants.IsoTimestampVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.IsoTimestampDescription,
+            new SnippetString(`{{$\${name:${Constants.IsoTimestampVariableName.slice(1)}}}}`)));
+        originalElements.push(new HttpElement(
+            Constants.RandomIntegerJetBrainsVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.RandomIntegerJetBrainsDescription,
+            new SnippetString(`{{$\${name:${Constants.RandomIntegerJetBrainsVariableName.slice(1)}}(\${1:min},\${2:max})}}`)));
+        originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
             ElementType.SystemVariable,
             null,

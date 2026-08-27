@@ -55,6 +55,17 @@ import crypto = require('crypto');
 const encodeUrl = require('encodeurl');
 const CookieFileStore = require('tough-cookie-file-store').FileCookieStore;
 
+/** Meta de la respuesta en cuanto llegan las cabeceras, antes del cuerpo. */
+export interface MetaRespuesta {
+    estado: number;
+    mensaje: string;
+    version: string;
+    cabeceras: ResponseHeaders;
+}
+
+/** Se llama por cada trozo del cuerpo según llega: es lo que permite pintar un stream en vivo. */
+export type AlRecibir = (trozo: Buffer, meta: MetaRespuesta) => void;
+
 type Certificate = {
     cert?: Buffer;
     key?: Buffer;
@@ -70,7 +81,7 @@ export class HttpClient {
         this.cookieStore = new CookieFileStore(cookieFilePath) as Store;
     }
 
-    public async send(httpRequest: HttpRequest, settings?: IRestClientSettings): Promise<HttpResponse> {
+    public async send(httpRequest: HttpRequest, settings?: IRestClientSettings, alRecibir?: AlRecibir): Promise<HttpResponse> {
         // Los ajustes del editor se cargan en diferido: quien llame desde la
         // terminal pasa los suyos y nunca entra aquí, que es lo que mantiene
         // este fichero libre de VS Code.
@@ -88,8 +99,15 @@ export class HttpClient {
                 headersSize += res.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
                 headersSize += (res.rawHeaders.length) / 2;
             }
+            const meta: MetaRespuesta = {
+                estado: res.statusCode ?? 0,
+                mensaje: res.statusMessage ?? '',
+                version: res.httpVersion ?? '1.1',
+                cabeceras: HttpClient.normalizeHeaderNames(res.headers, res.rawHeaders ?? [])
+            };
             res.on('data', chunk => {
                 bodySize += chunk.length;
+                alRecibir?.(chunk, meta);
             });
         });
 

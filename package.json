@@ -2,7 +2,7 @@
     "name": "httpkeeper",
     "displayName": "HttpKeeper",
     "description": "%ext.description%",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "publisher": "argalla",
     "author": {
         "name": "Argalla · Tecniart Galicia, S.L.",
@@ -193,6 +193,16 @@
             {
                 "command": "httpkeeper.import-swagger",
                 "title": "%cmd.import-swagger%",
+                "category": "HttpKeeper"
+            },
+            {
+                "command": "httpkeeper.set-secret",
+                "title": "%cmd.set-secret%",
+                "category": "HttpKeeper"
+            },
+            {
+                "command": "httpkeeper.delete-secret",
+                "title": "%cmd.delete-secret%",
                 "category": "HttpKeeper"
             }
         ],
@@ -702,7 +712,61 @@
                     "strings": true
                 }
             }
-        }
+        },
+        "languageModelTools": [
+            {
+                "name": "httpkeeper_send_request",
+                "displayName": "Send an HTTP request from a .http file",
+                "modelDescription": "Sends one request from a .http file in the workspace (by its # @name, or the first one if no name is given) and returns status, headers and body. Variables, environments and secrets are resolved the same way as when a person presses Send Request. Use it to check what an API really returns.",
+                "userDescription": "Send a request from a .http file and read the response",
+                "toolReferenceName": "httpkeeper",
+                "canBeReferencedInPrompt": true,
+                "icon": "$(arrow-swap)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "file": {
+                            "type": "string",
+                            "description": "Path of the .http file, relative to the workspace"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "The # @name of the request. Omit to send the first request of the file"
+                        }
+                    },
+                    "required": [
+                        "file"
+                    ]
+                }
+            },
+            {
+                "name": "httpkeeper_list_requests",
+                "displayName": "List the requests in a .http file",
+                "modelDescription": "Lists the requests (name, method, url, line) defined in a .http file of the workspace. Nothing is sent.",
+                "userDescription": "List the requests of a .http file",
+                "toolReferenceName": "httpkeeperList",
+                "canBeReferencedInPrompt": true,
+                "icon": "$(list-unordered)",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "file": {
+                            "type": "string",
+                            "description": "Path of the .http file, relative to the workspace"
+                        }
+                    },
+                    "required": [
+                        "file"
+                    ]
+                }
+            }
+        ],
+        "mcpServerDefinitionProviders": [
+            {
+                "id": "httpkeeper.mcp",
+                "label": "HttpKeeper"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "webpack --mode production",
@@ -716,12 +780,14 @@
         "build:cli": "tsc -p tsconfig.cli.json",
         "test:cli": "npm run build:cli && node scripts/probar-cli.mjs",
         "audit": "node scripts/auditoria.mjs",
-        "check": "npx tsc -p ./ --noEmit --skipLibCheck && npm run test:unit && npm run build:cli && npm run test:cli && npm run test:l10n && npm run audit && npm run test:vsix",
+        "check": "npx tsc -p ./ --noEmit --skipLibCheck && npm run test:unit && npm run build:cli && npm run test:cli && npm run test:mcp && npm run test:l10n && npm run audit && npm run test:vsix",
         "test:l10n": "node scripts/comprobar-l10n.mjs",
         "test:vsix": "node scripts/probar-vsix.mjs",
         "demo": "node scripts/demo/lanzar.mjs && node scripts/demo/montar.mjs",
         "build": "webpack --mode production",
-        "vigia": "node scripts/vigia-hilos.mjs"
+        "vigia": "node scripts/vigia-hilos.mjs",
+        "test:mcp": "node scripts/probar-mcp.mjs",
+        "preparar-npm": "node scripts/preparar-npm.mjs"
     },
     "devDependencies": {
         "@types/aws4": "^1.5.1",

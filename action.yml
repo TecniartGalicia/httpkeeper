@@ -1,0 +1,70 @@
+name: 'HttpKeeper'
+description: 'Run a .http file (REST Client / JetBrains HTTP Client format) with its # @assert checks, in CI'
+author: 'Argalla · Tecniart Galicia, S.L.'
+branding:
+  icon: 'send'
+  color: 'blue'
+
+inputs:
+  file:
+    description: 'Path of the .http file to run'
+    required: true
+  env:
+    description: 'Environment name from http-client.env.json'
+    required: false
+    default: ''
+  vars:
+    description: 'Variables, one key=value per line'
+    required: false
+    default: ''
+  junit:
+    description: 'Path of the JUnit XML report to write'
+    required: false
+    default: ''
+  continue-on-failure:
+    description: 'Keep running after a failed request'
+    required: false
+    default: 'false'
+  timeout:
+    description: 'Per-request timeout in milliseconds'
+    required: false
+    default: '30000'
+  version:
+    description: 'HttpKeeper release to use (latest, or a version like 1.1.0)'
+    required: false
+    default: 'latest'
+
+# Secrets: export them as HTTPKEEPER_SECRET_<NAME> in the step's env and use
+# {{$secret NAME}} in the file. They never appear in the log.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Run the .http file
+      shell: bash
+      env:
+        HK_FILE: ${{ inputs.file }}
+        HK_ENV: ${{ inputs.env }}
+        HK_VARS: ${{ inputs.vars }}
+        HK_JUNIT: ${{ inputs.junit }}
+        HK_CONTINUE: ${{ inputs.continue-on-failure }}
+        HK_TIMEOUT: ${{ inputs.timeout }}
+        HK_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        if [ "$HK_VERSION" = "latest" ]; then
+          url="https://github.com/TecniartGalicia/httpkeeper/releases/latest/download/httpkeeper-cli.js"
+        else
+          url="https://github.com/TecniartGalicia/httpkeeper/releases/download/v${HK_VERSION#v}/httpkeeper-cli.js"
+        fi
+        curl -fsSL "$url" -o "$RUNNER_TEMP/httpkeeper-cli.js"
+        args=("$HK_FILE" --timeout "$HK_TIMEOUT")
+        [ -n "$HK_ENV" ] && args+=(--env "$HK_ENV")
+        [ -n "$HK_JUNIT" ] && args+=(--junit "$HK_JUNIT")
+        [ "$HK_CONTINUE" = "true" ] && args+=(--continuar)
+        while IFS= read -r linea; do
+          [ -n "$linea" ] && args+=(--var "$linea")
+        done <<< "$HK_VARS"
+        node "$RUNNER_TEMP/httpkeeper-cli.js" "${args[@]}"

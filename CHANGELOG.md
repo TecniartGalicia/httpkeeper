@@ -3,6 +3,35 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-08-27
+
+Four things the original's users had been asking for since 2018, in one release. Everything is backwards compatible: a 1.0.0 file runs unchanged.
+
+### Added
+
+- **JetBrains `.http` format, complete.** `http-client.env.json` and `http-client.private.env.json` next to the file (the private one wins and belongs in `.gitignore`); `import ./other.http` and `run #name`; request variables across files (`{{login.response.body.$.token}}` resolves in the file that imports the one with `login`); and the JetBrains aliases `{{$uuid}}`, `{{$isoTimestamp}}`, `{{$random.integer(min,max)}}`. Upstream #229, #627, #182, #845, #1148, #943, #402.
+- **`{{$secret NAME}}`.** The value lives in the editor's encrypted secret storage, never in the file. Asked for the first time it is used; `HttpKeeper: Set secret` and `HttpKeeper: Delete secret` manage them. In the runner: `--secret NAME=value` or `HTTPKEEPER_SECRET_NAME`. Upstream #279.
+- **`text/event-stream` painted as it arrives.** The response panel opens with the first event and grows; cancelling keeps what was received. Assertions `sse.count`, `sse.first`, `sse.last`. The runner reads a stream to its end or to `--timeout`. Upstream #493.
+- **`WEBSOCKET url`** with the JetBrains syntax: messages in the body separated by `===`, `# @timeout ms` to decide how long to listen, a transcript as the response (`>>` sent, `<<` received, status 101). Assertions `ws.count`, `ws.first`, `ws.last`. Uses the WebSocket built into Node 22+, no dependency. Upstream #173.
+- **`# @timeout ms`** as a per-request metadata, for HTTP too.
+- **Tools for agents inside VS Code.** `#httpkeeper` lists the requests of a file and sends one by name from Copilot Chat or any language-model participant; sending asks for confirmation first. Files outside the workspace are refused. On VS Code 1.101+, the extension also announces its MCP server to the agent mode with no configuration.
+- **`httpkeeper mcp`**: an MCP server over stdio (no dependencies) with `list_requests`, `send_request` and `run_http_file`, for Claude Code, Cursor and any other agent. It only reads files under the root it was started with and never writes to disk.
+- **The runner everywhere.** `--junit report.xml` for GitHub/GitLab test dashboards; pasted `curl` commands; multipart bodies with `< file` and `<@ file` (variables substituted); the `httpkeeper` package on npm (`npx httpkeeper api.http`); and a GitHub Action, `TecniartGalicia/httpkeeper@v1`, that downloads the runner from the release and runs a file.
+- `HttpKeeper: Switch environment` accepts the environment name as an argument, for automation.
+
+### Fixed
+
+- `# @no-cookie-jar` was ignored when `# @no-redirect` was present on the same request (an `else if` in the original).
+- An `import` line was parsed as a request.
+- The `{{$shared x}}` mapping wrote back into the settings object.
+
+### Changed
+
+- The runner's `--timeout` (default 30 s) now applies to the whole response, and a stream that does not end is cut there with what arrived so far as the body.
+- Tests: 52 (24 unit, 28 integration against a real server, including an SSE endpoint and a hand-written WebSocket echo server).
+
+[1.1.0]: https://github.com/TecniartGalicia/httpkeeper/releases/tag/v1.1.0
+
 ## [1.0.0] - 2026-08-26
 
 First release of HttpKeeper, a maintained fork of [REST Client](https://github.com/Huachao/vscode-restclient) 0.25.1 by Huachao Mao (MIT), which has had no release since June 2022.

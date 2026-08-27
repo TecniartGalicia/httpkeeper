@@ -57,7 +57,7 @@ export class VariableProcessor {
         const [, [requestProvider], [fileProvider], [environmentProvider]] = this.providers;
         const requestVariables = await (requestProvider as RequestVariableProvider).getAll(document);
         const fileVariables = await (fileProvider as FileVariableProvider).getAll(document);
-        const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll();
+        const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll(document);
 
         const variableDefinitions = new Map<string, VariableType[]>();
 

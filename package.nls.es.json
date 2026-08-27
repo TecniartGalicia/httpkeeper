@@ -48,5 +48,7 @@
     "cfg.useContentDispositionFilename": "Usar el nombre de fichero de la cabecera `content-disposition` al guardar la respuesta.",
     "cmd.preview-html-response-body": "Ver como HTML",
     "cmd.show-raw-response": "Ver en crudo",
-    "cmd.import-swagger": "Importar desde un fichero"
+    "cmd.import-swagger": "Importar desde un fichero",
+    "cmd.set-secret": "Guardar un secreto (para {{$secret NOMBRE}})",
+    "cmd.delete-secret": "Borrar un secreto guardado"
 }

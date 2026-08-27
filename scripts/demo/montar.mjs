@@ -35,8 +35,11 @@ const correr = (args) => {
     if (r.status !== 0) { console.error(r.stderr?.slice(-1500)); throw new Error('ffmpeg fallo'); }
 };
 
+// El plano del stream se toma más tarde: a los 5 fotogramas aún no ha llegado
+// nada; a los 12 (2,4 s) hay tres o cuatro eventos en pantalla.
+const REPOSO_POR_PLANO = { '05-stream': 12 };
 for (const [plano, primero] of primeros) {
-    const n = primero + REPOSO;
+    const n = primero + (REPOSO_POR_PLANO[plano] ?? REPOSO);
     const origen = path.join(DEMO, `f${String(n).padStart(5, '0')}.png`);
     if (!fs.existsSync(origen)) { console.error(`falta ${origen}`); continue; }
     const destino = path.join(SHOTS, `${plano}.png`);

@@ -16,6 +16,7 @@ import { CALLBACK_PORT, OidcClient } from '../auth/oidcClient';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
+import { Secretos } from '../secretos';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,6 +36,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly processEnvRegex: RegExp = new RegExp(`\\${Constants.ProcessEnvVariableName}\\s(\\%)?(\\w+)`);
 
     private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s(\\%)?([\\w-.]+)`);
+    private readonly secretRegex: RegExp = new RegExp(`\\${Constants.SecretVariableName}\\s+([\\w.-]+)`);
+    private readonly randomIntegerJetBrainsRegex: RegExp = /\$random\.integer\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)/;
 
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
 
@@ -61,6 +64,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerRandomIntVariable();
         this.registerProcessEnvVariable();
         this.registerDotenvVariable();
+        this.registerSecretVariable();
+        this.registerJetBrainsAliases();
         this.registerAadTokenVariable();
         this.registerOidcTokenVariable();
         this.registerAadV2TokenVariable();
@@ -69,12 +74,16 @@ export class SystemVariableProvider implements HttpVariableProvider {
     public readonly type: VariableType = VariableType.System;
 
     public async has(name: string, document: TextDocument): Promise<boolean> {
-        const [variableName] = name.split(' ').filter(Boolean);
-        return this.resolveFuncs.has(variableName);
+        return this.resolveFuncs.has(SystemVariableProvider.nombreDe(name));
+    }
+
+    /** `$random.integer(1,9)` no lleva espacio: el nombre es lo que hay antes del paréntesis. */
+    private static nombreDe(name: string): string {
+        return name.split(' ').filter(Boolean)[0].replace(/\(.*$/, '');
     }
 
     public async get(name: string, document: TextDocument, context: HttpVariableContext): Promise<HttpVariable> {
-        const [variableName] = name.split(' ').filter(Boolean);
+        const variableName = SystemVariableProvider.nombreDe(name);
         if (!this.resolveFuncs.has(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.SystemVariableNotExist };
         }
@@ -222,6 +231,43 @@ export class SystemVariableProvider implements HttpVariableProvider {
             }
 
             return { warning: ResolveWarningMessage.IncorrectDotenvVariableFormat };
+        });
+    }
+
+    private registerSecretVariable() {
+        this.resolveFuncs.set(Constants.SecretVariableName, async name => {
+            const groups = this.secretRegex.exec(name);
+            if (groups === null) {
+                return { warning: 'Secret variable should follow format "{{$secret NAME}}"' };
+            }
+            const [, nombre] = groups;
+            if (!Secretos.listo) {
+                return { warning: 'Secret storage is not available' };
+            }
+            // La primera vez se pide y se guarda; a partir de ahí, ni se nota.
+            const valor = (await Secretos.get(nombre)) ?? (await Secretos.pedir(nombre));
+            if (valor === undefined) {
+                return { warning: `Secret "${nombre}" is not set. Run "HttpKeeper: Set secret"` };
+            }
+            return { value: valor };
+        });
+    }
+
+    /** Nombres de JetBrains para lo que ya existía: un fichero suyo funciona sin tocarlo. */
+    private registerJetBrainsAliases() {
+        this.resolveFuncs.set(Constants.UuidVariableName, async () => ({ value: uuidv4() }));
+        this.resolveFuncs.set(Constants.IsoTimestampVariableName, async () => ({ value: dayjs.utc().toISOString() }));
+        this.resolveFuncs.set(Constants.RandomIntegerJetBrainsVariableName, async name => {
+            const groups = this.randomIntegerJetBrainsRegex.exec(name);
+            if (groups === null) {
+                return { warning: 'Random integer should follow format "{{$random.integer(min,max)}}"' };
+            }
+            const min = Number(groups[1]);
+            const max = Number(groups[2]);
+            if (min >= max) {
+                return { warning: 'Random integer: min must be lower than max' };
+            }
+            return { value: String(min + Math.floor(Math.random() * (max - min))) };
         });
     }
 

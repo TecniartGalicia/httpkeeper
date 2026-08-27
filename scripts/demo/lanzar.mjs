@@ -28,6 +28,17 @@ const s = http.createServer((q, r) => {
         { id: 1003, cliente: 'Argalla, S.L.', importe: 990, estado: 'pagada' } ] });
     }
     if (q.url === '/facturas' && q.method === 'POST') return json(201, { id: 1004 });
+    if (q.url === '/chat') {
+      // Como responde una API de modelos: un evento cada 700 ms, para que se vea llegar.
+      r.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
+      const trozos = ['Las', ' facturas', ' pendientes', ' suman', ' 2.310 €', ' (CEIP', ' Plurilingüe).'];
+      let i = 0;
+      const tic = setInterval(() => {
+        if (i < trozos.length) r.write('data: {"delta":' + JSON.stringify(trozos[i++]) + '}\\n\\n');
+        else { r.write('data: [DONE]\\n\\n'); clearInterval(tic); r.end(); }
+      }, 700);
+      return;
+    }
     json(404, { error: 'no existe', ruta: q.url });
   });
 });
@@ -73,6 +84,17 @@ Authorization: Bearer {{entrar.response.body.$.token}}
 # @assert header.content-type contains json
 `;
 
+const CHAT_HTTP = (puerto) => `@host = http://127.0.0.1:${puerto}
+
+# Una API de modelos responde en streaming: el panel pinta cada evento según llega.
+POST {{host}}/chat
+Content-Type: application/json
+
+{ "prompt": "¿Cuánto suman las facturas pendientes?" }
+
+# @assert sse.last == [DONE]
+`;
+
 const AJUSTES = {
     'workbench.colorTheme': 'Default Dark Modern',
     'editor.minimap.enabled': false,
@@ -109,6 +131,7 @@ async function main() {
     const trabajo = fs.mkdtempSync(path.join(os.tmpdir(), 'demo-ws-'));
     fs.writeFileSync(path.join(trabajo, 'api.http'), API_HTTP(puerto));
     fs.writeFileSync(path.join(trabajo, 'pruebas.http'), PRUEBAS_HTTP(puerto));
+    fs.writeFileSync(path.join(trabajo, 'chat.http'), CHAT_HTTP(puerto));
     fs.mkdirSync(path.join(trabajo, '.vscode'));
     fs.writeFileSync(path.join(trabajo, '.vscode', 'settings.json'), JSON.stringify(AJUSTES, null, 2));
 

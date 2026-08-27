@@ -1,5 +1,6 @@
 import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
+import { cerrarImportaciones } from '../../core/importaciones';
 import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
@@ -57,13 +58,17 @@ export class RequestVariableProvider implements HttpVariableProvider {
         }
 
         const fileContent = document.getText();
-        const requestVariableReferenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
+        const textos = document.uri.scheme === 'file'
+            ? [fileContent, ...cerrarImportaciones(document.fileName, fileContent).importados.map(i => i.texto)]
+            : [fileContent];
 
         const variableNames = new Set<string>();
-        let match: RegExpExecArray | null;
-        while (match = requestVariableReferenceRegex.exec(fileContent)) {
-            const name = match[1];
-            variableNames.add(name);
+        for (const texto of textos) {
+            const requestVariableReferenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
+            let match: RegExpExecArray | null;
+            while (match = requestVariableReferenceRegex.exec(texto)) {
+                variableNames.add(match[1]);
+            }
         }
 
         const values = [...variableNames];

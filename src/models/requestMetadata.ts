@@ -21,6 +21,12 @@ export enum RequestMetadata {
      * Used to allow user to interactively input variables for this request
      */
     Prompt = 'prompt',
+
+    /**
+     * Tiempo máximo en milisegundos para esta petición; en un WebSocket, lo
+     * que se escucha antes de cerrar.
+     */
+    Timeout = 'timeout',
 }
 
 export function fromString(value: string): RequestMetadata | undefined {

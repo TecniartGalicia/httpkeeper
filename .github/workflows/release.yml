@@ -38,6 +38,7 @@ jobs:
       - run: npm run test:unit
       - run: npm run test:l10n
       - run: npm run test:cli
+      - run: npm run test:mcp
       - run: xvfb-run -a npm run test:integration
       - run: xvfb-run -a npm run test:vsix
       - run: npm run audit
@@ -62,8 +63,12 @@ jobs:
           else
             npx ovsx publish "httpkeeper-${GITHUB_REF_NAME}.vsix" -p "$OVSX_PAT"
           fi
+      - name: El runner suelto, para la acción de GitHub y para npx sin npm
+        run: cp dist/cli.js httpkeeper-cli.js
       - name: Publicación en GitHub
         uses: softprops/action-gh-release@v2
         with:
-          files: httpkeeper-${{ github.ref_name }}.vsix
+          files: |
+            httpkeeper-${{ github.ref_name }}.vsix
+            httpkeeper-cli.js
           generate_release_notes: true

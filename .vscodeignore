@@ -18,3 +18,5 @@ webpack.config.js
 README.es.md
 tslint.json
 dist/tsconfig.tsbuildinfo
+npm/**
+action.yml

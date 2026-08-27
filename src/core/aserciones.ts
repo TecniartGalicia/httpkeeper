@@ -10,7 +10,11 @@
  *   # @assert body.$.token exists
  *   # @assert headers.content-type contains json   (o `header.`, da igual)
  *   # @assert time < 2000
+ *   # @assert sse.count == 3            (respuestas text/event-stream)
+ *   # @assert ws.last contains eco      (transcripciones WebSocket)
  */
+import { leerEventos } from './sse';
+import { leerTranscripcion } from './websocket';
 
 export type Operador = '==' | '!=' | '<' | '>' | 'contains' | 'matches' | 'exists';
 
@@ -76,6 +80,24 @@ export function valorDe(sujeto: string, r: RespuestaComprobable): string {
     if (sujeto === 'body' || sujeto === 'body.*') {
         return r.cuerpo ?? '';
     }
+    if (sujeto.startsWith('sse.')) {
+        const eventos = leerEventos(r.cuerpo ?? '');
+        switch (sujeto.slice(4)) {
+            case 'count': return String(eventos.length);
+            case 'first': return eventos[0]?.datos ?? '';
+            case 'last': return eventos[eventos.length - 1]?.datos ?? '';
+            default: return '';
+        }
+    }
+    if (sujeto.startsWith('ws.')) {
+        const { recibidos } = leerTranscripcion(r.cuerpo ?? '');
+        switch (sujeto.slice(3)) {
+            case 'count': return String(recibidos.length);
+            case 'first': return recibidos[0] ?? '';
+            case 'last': return recibidos[recibidos.length - 1] ?? '';
+            default: return '';
+        }
+    }
     if (sujeto.startsWith('body.$')) {
         return porRuta(r.cuerpo, sujeto.slice('body.$'.length).replace(/^\./, ''));
     }
@@ -121,6 +143,7 @@ export function sujetoConocido(sujeto: string): boolean {
         || sujeto === 'body'
         || sujeto === 'body.*'
         || sujeto.startsWith('body.$')
+        || /^(sse|ws).(count|first|last)$/.test(sujeto)
         || PREFIJOS_CABECERA.some(pre => sujeto.startsWith(pre) && sujeto.length > pre.length);
 }
 

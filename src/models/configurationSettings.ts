@@ -316,8 +316,14 @@ export class RequestSettings implements Partial<IRestClientSettings> {
 
     private _rememberCookiesForSubsequentRequests?: boolean = undefined;
 
+    private _timeoutInMilliseconds?: number = undefined;
+
     public get followRedirect() {
         return this._followRedirect;
+    }
+
+    public get timeoutInMilliseconds() {
+        return this._timeoutInMilliseconds;
     }
 
     public get rememberCookiesForSubsequentRequests() {
@@ -327,8 +333,13 @@ export class RequestSettings implements Partial<IRestClientSettings> {
     public constructor(metadatas: Map<RequestMetadata, string | undefined>) {
         if (metadatas.has(RequestMetadata.NoRedirect)) {
             this._followRedirect = false;
-        } else if (metadatas.has(RequestMetadata.NoCookieJar)) {
+        }
+        if (metadatas.has(RequestMetadata.NoCookieJar)) {
             this._rememberCookiesForSubsequentRequests = false;
+        }
+        const timeout = Number(metadatas.get(RequestMetadata.Timeout));
+        if (metadatas.has(RequestMetadata.Timeout) && Number.isFinite(timeout) && timeout > 0) {
+            this._timeoutInMilliseconds = timeout;
         }
     }
 }
@@ -344,7 +355,7 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     public get timeoutInMilliseconds() {
-        return this.systemSettings.timeoutInMilliseconds;
+        return this.requestSettings.timeoutInMilliseconds ?? this.systemSettings.timeoutInMilliseconds;
     }
 
     public get showResponseInDifferentTab() {

@@ -1,5 +1,7 @@
 # HttpKeeper, nivel 2 — análisis de mejoras
 
+> **Estado 2026-08-27: EJECUTADO y publicado como 1.1.0.** Las cuatro fases están hechas y auditadas (52 pruebas, runner 15/15, MCP 14/14, auditoría 0 fallos, `.vsix` instalado en limpio). Lo que quedó fuera: `run` con variables en línea y los scripts `{% %}` de JetBrains; la publicación en npm es del humano (ver `TUS-TAREAS.md`).
+
 Fecha: 2026-08-27. Estado de partida: 1.0.0 publicada, «fork mantenido de REST Client». La pregunta es qué lo convierte en **el cliente HTTP en texto que la gente elige en 2026**, no en un REST Client con parches.
 
 ## 1. Lo que dice el mercado (cifras de hoy)

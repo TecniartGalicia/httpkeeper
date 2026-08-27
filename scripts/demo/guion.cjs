@@ -87,6 +87,20 @@ exports.run = async () => {
     senal('04-runner');
     await espera(3500);
 
+    // --- 5. Streaming: la respuesta de una API de modelos, evento a evento ----
+    await vscode.commands.executeCommand('workbench.action.closePanel');
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+    await espera(600);
+    const chat = await abrir('chat.http');
+    await espera(800);
+    // Se señala ANTES de enviar: el plano bueno es el de mitad del stream.
+    senal('05-stream');
+    await enviar(chat, 'POST {{host}}/chat');
+    await espera(7000);
+    await limpiar();
+    senal('06-stream-final');
+    await espera(2000);
+
     fs.writeFileSync(path.join(SALIDA, 'fin.txt'), 'listo');
     await espera(1500);
 };

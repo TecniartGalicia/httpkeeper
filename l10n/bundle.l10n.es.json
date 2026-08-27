@@ -35,5 +35,19 @@
     "Saved to {0}": "Guardado en {0}",
     "Generate Code Snippet": "Generar fragmento de código",
     "{0} is not found": "no se encuentra {0}",
-    "Request '{0}' has not been sent": "la petición «{0}» todavía no se ha enviado"
+    "Request '{0}' has not been sent": "la petición «{0}» todavía no se ha enviado",
+    "from http-client.env.json": "de http-client.env.json",
+    "There is no environment named \"{0}\"": "No hay ningún entorno que se llame «{0}»",
+    "Environment file: {0}": "Fichero de entorno: {0}",
+    "Value for secret \"{0}\" (stored encrypted, never written to the file)": "Valor del secreto «{0}» (se guarda cifrado; nunca se escribe en el fichero)",
+    "Secret name (use it as {{$secret NAME}})": "Nombre del secreto (se usa como {{$secret NOMBRE}})",
+    "Letters, digits, dots, dashes and underscores only": "Solo letras, cifras, puntos, guiones y guiones bajos",
+    "Secret \"{0}\" saved": "Secreto «{0}» guardado",
+    "There are no secrets stored": "No hay ningún secreto guardado",
+    "Secret to delete": "Secreto que quieres borrar",
+    "Secret \"{0}\" deleted": "Secreto «{0}» borrado",
+    "cancelled; the events above were received before": "cancelado; los eventos de arriba llegaron antes",
+    "Sending {0} from {1}": "Enviando {0} desde {1}",
+    "Send HTTP request": "Enviar petición HTTP",
+    "Send **{0}** from `{1}`?": "¿Enviar **{0}** desde `{1}`?"
 }

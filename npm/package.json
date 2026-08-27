@@ -1,0 +1,39 @@
+{
+  "name": "httpkeeper",
+  "version": "1.1.0",
+  "description": "Run .http files (REST Client / JetBrains HTTP Client format) from the terminal: assertions, environments, secrets, SSE, WebSocket, JUnit output and an MCP server for agents. The runner of the HttpKeeper VS Code extension.",
+  "bin": {
+    "httpkeeper": "cli.js"
+  },
+  "files": [
+    "cli.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "author": "Argalla · Tecniart Galicia, S.L.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TecniartGalicia/httpkeeper.git"
+  },
+  "homepage": "https://github.com/TecniartGalicia/httpkeeper#readme",
+  "bugs": {
+    "url": "https://github.com/TecniartGalicia/httpkeeper/issues"
+  },
+  "keywords": [
+    "http",
+    "rest",
+    "api",
+    "testing",
+    "ci",
+    "dothttp",
+    "rest-client",
+    "jetbrains",
+    "mcp",
+    "sse",
+    "websocket"
+  ]
+}

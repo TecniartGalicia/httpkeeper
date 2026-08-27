@@ -17,3 +17,7 @@ media/demo/
 
 # Estado e informes del vigía diario: locales, se regeneran
 vigia/
+
+# Paquete npm: cli.js y LICENSE se copian con npm run preparar-npm
+npm/cli.js
+npm/LICENSE

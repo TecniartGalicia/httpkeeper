@@ -78,7 +78,7 @@ ok('aws-amplify fuera', !JSON.stringify(pkg.dependencies).includes('aws-amplify'
 ok('xmldom sin mantenimiento fuera', pkg.dependencies.xmldom === undefined);
 
 seccion('el núcleo no depende del editor');
-for (const f of ['src/cli/index.ts', 'src/core/secuencia.ts', 'src/core/aserciones.ts', 'src/utils/httpClient.ts']) {
+for (const f of ['src/cli/index.ts', 'src/cli/mcp.ts', 'src/cli/parserMinimo.ts', 'src/core/secuencia.ts', 'src/core/aserciones.ts', 'src/core/entornosJetBrains.ts', 'src/core/importaciones.ts', 'src/core/sse.ts', 'src/core/websocket.ts', 'src/core/junit.ts', 'src/utils/httpClient.ts']) {
   const r = correr(`node scripts/rastrear-vscode.mjs ${f}`);
   ok(`${path.basename(f)} no arrastra vscode`, r.codigo === 0, r.codigo === 0 ? '' : r.salida.split('\n')[0]);
 }
@@ -125,6 +125,32 @@ const restosPermitidos = ['src/utils/configuracionHeredada.ts', 'src/utils/userD
 const restos = fuentes.filter((f) => !restosPermitidos.includes(f) && /rest-client|vscode-restclient/.test(leer(f)));
 ok('sin restos del nombre viejo fuera de donde toca', restos.length === 0, restos.join(', '));
 
+seccion('nivel 2: formato JetBrains, streaming, agentes y runner');
+const cliFuente = leer('src/cli/index.ts');
+ok('el runner entiende --env, --secret, --junit y --timeout', ['--env', '--secret', '--junit', '--timeout'].every((o) => cliFuente.includes(`'${o}'`)));
+ok('el runner lee http-client.env.json e import/run', cliFuente.includes('carpetaDeEntornos') && cliFuente.includes('resolverRun'));
+const selector = leer('src/utils/selector.ts');
+ok('el editor resuelve run #nombre y salta las lineas import', selector.includes('resolverRun') && selector.includes('isImportLine'));
+const sistema = leer('src/utils/httpVariableProviders/systemVariableProvider.ts');
+ok('el editor tiene $secret y los alias de JetBrains', sistema.includes('SecretVariableName') && sistema.includes('UuidVariableName') && sistema.includes('IsoTimestampVariableName'));
+const controlador = leer('src/controllers/requestController.ts');
+ok('el panel pinta text/event-stream segun llega', controlador.includes('iniciarStreaming') && controlador.includes('anadirTrozo'));
+ok('WEBSOCKET se atiende en el editor y en el runner', controlador.includes("'WEBSOCKET'") && leer('src/cli/parserMinimo.ts').includes("'WEBSOCKET'"));
+const herramientas = leer('src/utils/herramientasLm.ts');
+ok('la herramienta de envio para agentes pide confirmacion', herramientas.includes('prepareInvocation') && herramientas.includes('confirmationMessages'));
+ok('la herramienta rechaza ficheros fuera del espacio de trabajo', herramientas.includes('is outside the workspace'));
+ok('las herramientas van declaradas en el manifiesto', (pkg.contributes.languageModelTools ?? []).length === 2 && (pkg.contributes.mcpServerDefinitionProviders ?? []).length === 1);
+const mcp = leer('src/cli/mcp.ts');
+ok('el servidor MCP acota la raiz y no escribe en disco', mcp.includes('dentroDeLaRaiz') && !/fs\.write|writeFileSync/.test(mcp));
+const mcpPrueba = correr('node scripts/probar-mcp.mjs');
+ok('el servidor MCP pasa su prueba de punta a punta', mcpPrueba.codigo === 0, /(\d+) fallos/.exec(mcpPrueba.salida)?.[0] ?? '');
+ok('existe la accion de GitHub y descarga el runner de la publicacion', fs.existsSync('action.yml') && leer('action.yml').includes('using: composite') && leer('action.yml').includes('httpkeeper-cli.js'));
+ok('el flujo de release adjunta el runner suelto', leer('.github/workflows/release.yml').includes('httpkeeper-cli.js'));
+const npmPkg = JSON.parse(leer('npm/package.json'));
+ok('el paquete npm tiene el mismo numero de version', npmPkg.version === pkg.version, `npm ${npmPkg.version} / extension ${pkg.version}`);
+ok('el paquete npm es solo el runner', npmPkg.bin?.httpkeeper === 'cli.js' && JSON.stringify(npmPkg.files) === JSON.stringify(['cli.js', 'README.md', 'LICENSE']) && !npmPkg.dependencies);
+ok('la gramatica pinta import y run', leer('syntaxes/http.tmLanguage.json').includes('http.import') && leer('syntaxes/http.tmLanguage.json').includes('http.run'));
+
 seccion('las dos lenguas estan completas');
 const l10n = correr('node scripts/comprobar-l10n.mjs');
 ok('ingles y castellano sin huecos', l10n.codigo === 0, /=+ (\d+) fallos/.exec(l10n.salida)?.[1] + ' fallos');
@@ -142,6 +168,7 @@ for (const r of recursos) {
 ok('sin codigo fuente dentro', !empaquetados.some((f) => f.startsWith('src/')));
 ok('sin mapas de codigo dentro', !empaquetados.some((f) => f.endsWith('.map')));
 ok('sin los documentos internos dentro', !empaquetados.some((f) => f.startsWith('docs/') || f.startsWith('scripts/')));
+ok('sin el paquete npm ni la accion dentro', !empaquetados.some((f) => f.startsWith('npm/') || f === 'action.yml'));
 if (fs.existsSync('dist/cli.js')) {
   const cli = leer('dist/cli.js');
   ok('el runner publicado arranca solo (shebang)', cli.startsWith('#!/usr/bin/env node'));

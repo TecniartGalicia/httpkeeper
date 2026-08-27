@@ -93,10 +93,12 @@ export async function ejecutarSecuencia(bloques: Bloque[], opciones: OpcionesSec
 
     for (const bloque of bloques) {
         const t0 = Date.now();
-        const nombre = bloque.nombre ?? `#${hechos.length + 1}`;
+        // El nombre se toma del bloque ya resuelto: un `run #login` se llama login.
+        let nombre = bloque.nombre ?? `#${hechos.length + 1}`;
         let paso: PasoEjecutado;
         try {
             const listo = opciones.resolver ? await opciones.resolver(bloque) : bloque;
+            nombre = listo.nombre ?? nombre;
             const r = await opciones.enviar(listo);
             paso = { nombre, linea: bloque.linea, estado: r.estado, cuerpo: r.cuerpo, cabeceras: r.cabeceras, ms: Date.now() - t0 };
         } catch (e) {
@@ -109,4 +111,35 @@ export async function ejecutarSecuencia(bloques: Bloque[], opciones: OpcionesSec
         }
     }
     return hechos;
+}
+
+const LINEA_DECLARACION = /^\s*(?:(?:#|\/\/).*|@[\w.-]+\s*=.*|import\s+\S.*)?$/;
+
+/** Un bloque que sólo tiene `import`, `@variables` y comentarios no es una petición. */
+export function esPeticion(bloque: Bloque): boolean {
+    return bloque.texto.split(SALTOS).some(l => !LINEA_DECLARACION.test(l));
+}
+
+export interface ResumenPeticion {
+    nombre?: string;
+    metodo: string;
+    url: string;
+    /** Línea (base 0) del bloque en el fichero. */
+    linea: number;
+}
+
+/**
+ * Qué peticiones hay en un fichero, sin resolver variables ni enviar nada:
+ * lo que un agente necesita para decidir cuál lanzar.
+ */
+export function resumenDePeticiones(texto: string): ResumenPeticion[] {
+    return trocear(texto).filter(esPeticion).map(b => {
+        const primera = b.texto.split(SALTOS).find(l => !LINEA_DECLARACION.test(l))!.trim();
+        const m = /^([A-Z]+)\s+(\S.*)$/.exec(primera);
+        const run = /^run\s+#(\S+)/.exec(primera);
+        if (run) {
+            return { nombre: b.nombre, metodo: 'RUN', url: `#${run[1]}`, linea: b.linea };
+        }
+        return { nombre: b.nombre, metodo: m ? m[1] : 'GET', url: (m ? m[2] : primera).replace(/\s+HTTP\/.*$/i, ''), linea: b.linea };
+    });
 }

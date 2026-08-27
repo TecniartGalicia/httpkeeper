@@ -101,6 +101,30 @@
     {
       "captures": {
         "1": {
+          "name": "keyword.control.import.http"
+        },
+        "2": {
+          "name": "string.other.http"
+        }
+      },
+      "match": "^\\s*(import)\\s+(\\S.*?)\\s*$",
+      "name": "http.import"
+    },
+    {
+      "captures": {
+        "1": {
+          "name": "keyword.control.run.http"
+        },
+        "2": {
+          "name": "variable.other.http"
+        }
+      },
+      "match": "^\\s*(run)\\s+(#\\S+)\\s*$",
+      "name": "http.run"
+    },
+    {
+      "captures": {
+        "1": {
           "name": "keyword.operator.http"
         },
         "2": {
