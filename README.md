@@ -78,13 +78,13 @@ In VS Code, `#httpkeeper` lists the requests of a file and sends one by name fro
 Outside the editor, `httpkeeper mcp` is an MCP server over stdio for Claude Code, Cursor or anything else that speaks MCP: `list_requests`, `send_request`, `run_http_file`. It only reads files under the root it was started with and never writes to disk.
 
 ```json
-{ "mcpServers": { "httpkeeper": { "command": "npx", "args": ["httpkeeper", "mcp", "--raiz", "."] } } }
+{ "mcpServers": { "httpkeeper": { "command": "npx", "args": ["httpkeeper-cli", "mcp", "--raiz", "."] } } }
 ```
 
 ### The runner, everywhere (+44)
 
 ```console
-$ npx httpkeeper api.http --env dev --secret API_KEY=… --junit report.xml
+$ npx httpkeeper-cli api.http --env dev --secret API_KEY=… --junit report.xml
   ok   login                200  184 ms
   ok   invoices             200    9 ms
 

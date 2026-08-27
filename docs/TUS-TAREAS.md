@@ -24,7 +24,7 @@ npm login          # abre el navegador; cuenta de npm de Argalla (o créala en n
 npm publish --access public
 ```
 
-Con eso funcionan `npx httpkeeper api.http` y la configuración MCP del README (`npx httpkeeper mcp`). La acción de GitHub **no** depende de npm: descarga el runner de la publicación de GitHub.
+Con eso funcionan `npx httpkeeper-cli api.http` y la configuración MCP del README (`npx httpkeeper-cli mcp`). La acción de GitHub **no** depende de npm: descarga el runner de la publicación de GitHub.
 
 ## 2. Anunciar la 1.1.0 donde la pedían — [MARKETING.md](MARKETING.md)
 

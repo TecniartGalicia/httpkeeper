@@ -2,7 +2,7 @@
     "name": "httpkeeper",
     "displayName": "HttpKeeper",
     "description": "%ext.description%",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "publisher": "argalla",
     "author": {
         "name": "Argalla · Tecniart Galicia, S.L.",

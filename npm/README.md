@@ -1,9 +1,9 @@
-# httpkeeper
+# httpkeeper-cli
 
-Run `.http` files from the terminal. Same format as VS Code's REST Client and JetBrains' HTTP Client: requests, `# @name`, `{{variables}}`, `http-client.env.json` environments, `import` / `run #name`, `# @assert` checks, `text/event-stream` and `WEBSOCKET`.
+Run `.http` files from the terminal (the command is `httpkeeper`; the package is `httpkeeper-cli` because npm reserves names too close to an unrelated `http-keeper`). Same format as VS Code's REST Client and JetBrains' HTTP Client: requests, `# @name`, `{{variables}}`, `http-client.env.json` environments, `import` / `run #name`, `# @assert` checks, `text/event-stream` and `WEBSOCKET`.
 
 ```console
-$ npx httpkeeper api.http --env dev --secret API_KEY=… --junit report.xml
+$ npx httpkeeper-cli api.http --env dev --secret API_KEY=… --junit report.xml
   ok   login                200  184 ms
   ok   facturas             200    9 ms
 

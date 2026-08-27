@@ -24,7 +24,7 @@ Repositorio: https://github.com/Huachao/vscode-restclient — Marketplace: https
 
 ## #432 — runner de terminal
 
-> Update for the maintained fork: the runner now writes JUnit (`--junit report.xml`) for GitHub/GitLab test dashboards, reads pasted `curl` commands and multipart bodies with `< file`, ships as `npx httpkeeper` and as a GitHub Action (`TecniartGalicia/httpkeeper@v1`), and `httpkeeper mcp` exposes the same thing to agents over MCP. https://github.com/TecniartGalicia/httpkeeper#the-runner-everywhere-44
+> Update for the maintained fork: the runner now writes JUnit (`--junit report.xml`) for GitHub/GitLab test dashboards, reads pasted `curl` commands and multipart bodies with `< file`, ships as `npx httpkeeper-cli` and as a GitHub Action (`TecniartGalicia/httpkeeper@v1`), and `httpkeeper mcp` exposes the same thing to agents over MCP. https://github.com/TecniartGalicia/httpkeeper#the-runner-everywhere-44
 
 ## #1394 — el hilo del mantenedor (una línea)
 

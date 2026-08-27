@@ -3,6 +3,14 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-08-27
+
+### Changed
+
+- The npm package is **`httpkeeper-cli`** (`npx httpkeeper-cli api.http`): npm refuses `httpkeeper` as too similar to an unrelated `http-keeper`. The command it installs is still `httpkeeper`. READMEs updated accordingly.
+
+[1.1.1]: https://github.com/TecniartGalicia/httpkeeper/releases/tag/v1.1.1
+
 ## [1.1.0] - 2026-08-27
 
 Four things the original's users had been asking for since 2018, in one release. Everything is backwards compatible: a 1.0.0 file runs unchanged.
@@ -16,7 +24,7 @@ Four things the original's users had been asking for since 2018, in one release.
 - **`# @timeout ms`** as a per-request metadata, for HTTP too.
 - **Tools for agents inside VS Code.** `#httpkeeper` lists the requests of a file and sends one by name from Copilot Chat or any language-model participant; sending asks for confirmation first. Files outside the workspace are refused. On VS Code 1.101+, the extension also announces its MCP server to the agent mode with no configuration.
 - **`httpkeeper mcp`**: an MCP server over stdio (no dependencies) with `list_requests`, `send_request` and `run_http_file`, for Claude Code, Cursor and any other agent. It only reads files under the root it was started with and never writes to disk.
-- **The runner everywhere.** `--junit report.xml` for GitHub/GitLab test dashboards; pasted `curl` commands; multipart bodies with `< file` and `<@ file` (variables substituted); the `httpkeeper` package on npm (`npx httpkeeper api.http`); and a GitHub Action, `TecniartGalicia/httpkeeper@v1`, that downloads the runner from the release and runs a file.
+- **The runner everywhere.** `--junit report.xml` for GitHub/GitLab test dashboards; pasted `curl` commands; multipart bodies with `< file` and `<@ file` (variables substituted); the `httpkeeper` package on npm (`npx httpkeeper-cli api.http`); and a GitHub Action, `TecniartGalicia/httpkeeper@v1`, that downloads the runner from the release and runs a file.
 - `HttpKeeper: Switch environment` accepts the environment name as an argument, for automation.
 
 ### Fixed
