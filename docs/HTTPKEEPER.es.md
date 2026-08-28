@@ -1,4 +1,6 @@
-# HttpKeeper
+# HttpKeeper — lo que añade este REST Client mantenido
+
+> Esta es la versión larga, con capturas. El README de la extensión es [la referencia original de Huachao Mao](../README.md), conservada íntegra.
 
 **Envía peticiones HTTP desde un fichero `.http` y lee la respuesta en el editor.** Sin cuenta, sin nube, sin muro de pago, sin telemetría.
 
@@ -107,7 +109,7 @@ Devuelve 0 si todas las comprobaciones pasan y 1 si falla alguna; `--json` para 
 
 ## Referencia completa
 
-Todo lo heredado de REST Client —sintaxis de las peticiones, GraphQL, cURL, autenticación (Basic, Digest, certificados de cliente, Azure AD, AWS), variables, entornos, generación de código, ajustes— está documentado íntegro en [docs/REFERENCE.md](docs/REFERENCE.md) (en inglés, el texto original). No se quitó nada.
+Todo lo heredado de REST Client —sintaxis de las peticiones, GraphQL, cURL, autenticación (Basic, Digest, certificados de cliente, Azure AD, AWS), variables, entornos, generación de código, ajustes— está documentado íntegro en el [README](../README.md) (en inglés, el texto original). No se quitó nada.
 
 ## Venir desde REST Client
 
@@ -127,4 +129,4 @@ Todo el comportamiento bien resuelto que hay aquí dentro es obra de Huachao Mao
 
 ---
 
-Argalla · Tecniart Galicia, S.L. — [English](README.md)
+Argalla · Tecniart Galicia, S.L. — [English](HTTPKEEPER.md)

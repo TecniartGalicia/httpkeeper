@@ -202,13 +202,13 @@ const cuentaIts = (dir) => fs.readdirSync(dir, { recursive: true })
     .filter((f) => String(f).endsWith('.test.ts'))
     .reduce((n, f) => n + (leer(path.join(dir, String(f))).match(/\bit\(/g)?.length ?? 0), 0);
 const nPruebas = cuentaIts('src/test/unit') + cuentaIts('src/test/integration');
-for (const f of ['README.md', 'README.es.md']) {
+for (const f of ['docs/HTTPKEEPER.md', 'docs/HTTPKEEPER.es.md']) {
     const prometido = /\*\*(\d+)\*\*\s*\(/.exec(leer(f))?.[1];
     ok(`${f} promete el numero de pruebas que hay`, Number(prometido) === nPruebas, `dice ${prometido}, hay ${nPruebas}`);
 }
 ok('las unitarias que corren son las que estan escritas', Number(nUnit) === cuentaIts('src/test/unit'), `${nUnit} corriendo`);
-ok('promete 399 paquetes', readme.includes('399'));
-ok('promete cero telemetría', readme.toLowerCase().includes('none'));
+ok('promete 399 paquetes', leer('docs/HTTPKEEPER.md').includes('399') && readme.includes('399'));
+ok('promete cero telemetría', leer('docs/HTTPKEEPER.md').toLowerCase().includes('none') && readme.toLowerCase().includes('telemetry removed'));
 
 console.log(`\n===== ${fallos} fallos`);
 process.exit(fallos ? 1 : 0);
