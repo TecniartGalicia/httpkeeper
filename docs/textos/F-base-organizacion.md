@@ -1,29 +1,29 @@
-# Para la incidencia «qué fork usar de base» en vscode-restclient/vscode-restclient
+# Comparativa de forks para la organización (la publica el humano)
 
-Marcello dijo que abriría esa incidencia y que le había pedido a una IA los pros y contras. Esto es lo que se publica cuando la abra (lo publica el humano): hechos comprobables, con lo que tiene cada uno y lo que le falta, y un plan de adopción que le cuesta a él cinco minutos.
+Marcello dijo que le pediría a una IA los pros y contras y abriría una incidencia en el repositorio de la organización. Esto se adelanta con hechos medidos el 2026-08-28 en los tres repositorios (clonados y auditados con los mismos comandos): historial, pruebas, `npm audit --omit=dev`, dependencias, CI, telemetría, PRs, documentación, tiendas. Dónde publicarlo: en #1394 (todos suscritos) y, cuando exista, en la incidencia del repositorio de la organización.
 
 ---
 
-> Facts first, so the comparison is about code and not about people. Everything below can be checked in the repos.
+> For the base decision, here are the numbers rather than opinions. I cloned the three repositories today and ran the same checks on each (`git log`, `npm audit --omit=dev`, test count, CI files, store listings). Corrections welcome — @tutilus, please fix anything I got wrong about yours.
 >
-> | | Huachao/master (org repo today) | tutilus/rest-client-next | TecniartGalicia/httpkeeper |
+> | | Huachao/master (the org repo today) | tutilus/vscode-restclientnext | TecniartGalicia/httpkeeper |
 > |---|---|---|---|
-> | History | original | independent (re-imported) | original + 15 commits on top, `git log` shows both |
-> | Tests | 0 | ? | 52 (24 unit, 28 integration sending real requests through the extension) |
-> | Production vulnerabilities (`npm audit --omit=dev`) | 75 (6 critical) | ? | 0 |
-> | Dependencies | 1,487 packages | ? | 399 (`aws-amplify` replaced by 60 lines) |
-> | Telemetry | Application Insights | ? | removed |
-> | CI | Node CI from 2019 (fails) | GitHub Actions | GitHub Actions on Linux/macOS/Windows; release workflow publishes Marketplace + Open VSX + npm + GitHub from one tag; the packaged `.vsix` is installed in a clean VS Code and exercised as part of CI |
-> | Upstream PRs | 61 open | some merged | 3 merged after testing (#1440 Cursor, #1432, #853), 2 rejected with reasons (#1396 breaks localhost, #532 runs shell commands), 4 pending, 52 conflict |
-> | Most-voted features | — | — | #267 assertions, #724/#444 run a whole file, #432 CLI runner, #229/#627 env files, #182/#845/#1148 import/run, #279 secrets, #493 SSE, #173 WebSocket |
-> | Compatibility | — | — | additive only: REST Client files, `rest-client.*` settings and `~/.rest-client` unchanged; 28 integration tests pin the inherited behaviour |
-> | Docs | README | split into docs | README + Huachao's full reference verbatim (`docs/REFERENCE.md`) |
-> | Published | `humao.rest-client` (2022) | `tutilus.rest-client-next` (Open VSX?) | `argalla.httpkeeper` on Marketplace + Open VSX, `httpkeeper-cli` on npm, GitHub Action |
+> | Git history | original, 840 commits | **independent**: 146 commits since 2026-02-19 ("init yeoman vscode"), none of the original commits | original 840 + 35 on top; every upstream commit still attributable |
+> | Tests | 0 | 8 (`vscode-test`, 175 lines: variable regex, auth headers, proxy mapping) | 52 (24 unit + 28 integration that send real requests through the extension against a local server, incl. SSE and a WebSocket echo) |
+> | `npm audit --omit=dev` | 75 vulnerabilities (6 critical) | 3 (2 high, 1 moderate) | 0 |
+> | Production packages | 1,487 | 236 (`aws-amplify` still in) | 399 (`aws-amplify` replaced by a 60-line Cognito client) |
+> | Telemetry | Application Insights | removed | removed |
+> | CI | Node CI from 2019 (broken) | CodeQL + release (`vsce`); no test job | tests on Linux/macOS/Windows; release publishes Marketplace + Open VSX + npm + GitHub from one tag; the built `.vsix` is installed in a clean VS Code and exercised in CI |
+> | Upstream PRs handled | 61 open | 6 merged (#1422 `@set`, #1388 run all sequentially, #1104, #1356, #1380, #1381) | 3 merged after testing (#1440 Cursor, #1432, #853); 2 rejected with written reasons (#1396 broke `localhost`, #532 ran shell commands from the file); 52 conflict, triaged in `docs/PRS-REVISADOS.md` |
+> | Most-voted requests | — | run all sequentially (#1388) | #267 assertions, #724/#444 run a whole file with chained variables, #432 CLI runner, #229/#627 env files, #182/#845/#1148 import/run, #279 secrets, #493 SSE live, #173 WebSocket |
+> | Compatibility | — | preserved (stated goal) | additive only: REST Client files, `rest-client.*` settings and `~/.rest-client` untouched; 28 integration tests pin the inherited behaviour |
+> | Docs | README | Jekyll docs site, 9 pages (nice) | README + Huachao's full reference verbatim in `docs/REFERENCE.md` |
+> | Minimum VS Code | 1.81 | 1.106 | 1.81 (newer APIs — LM tools, MCP — are guarded at runtime) |
+> | Published | `humao.rest-client`, 2022 | `tutilus.rest-client-next`, Marketplace only, 30 installs | `argalla.httpkeeper` on Marketplace and Open VSX (Cursor/VSCodium), `httpkeeper-cli` on npm, GitHub Action |
+> | Credit to Huachao | — | yes, README | yes: README, CHANGELOG, `contributors`, LICENSE line kept |
 >
-> I filled the tutilus column with question marks where I have not checked; @tutilus, please correct or complete it — I would rather the table be right than favourable.
+> kit1211's `cursor-rest-client-plus` (Open VSX only, 1,547 downloads) is worth a mention too: its Cursor fix is the PR we merged (#1440), and its response-tab reuse and `{{$faker}}` would be good contributions to whichever base wins.
 >
-> **How adopting HttpKeeper as the base would work** (five minutes of your time, @marcellourbani): since it is a proper fork of this repo's history, `git fetch https://github.com/TecniartGalicia/httpkeeper master && git push origin FETCH_HEAD:main` puts the whole thing here with the history intact — no rewrite, no squash, every upstream commit still attributable. Then two follow-up PRs from us: (1) graft tutilus's CI/docs/UX work, (2) rename the publishing identity to whatever the org decides. The secrets the release workflow needs (`VSCE_PAT`, `OVSX_PAT`, `NPM_TOKEN`) are the org's to create; I can document each step.
+> **What I would take from this:** the org repo should have the original history (so Huachao's work stays his in `git blame` and any future upstream merge is trivial), tests before merges, and a release pipeline that reaches the editors people actually use. HttpKeeper has those today; rest-client-next has the better documentation site and a cleaner dependency story on `engines`. So my proposal is: base = HttpKeeper's `master` pushed as-is (`git fetch https://github.com/TecniartGalicia/httpkeeper master && git push origin FETCH_HEAD:main`, five minutes, no rewrite), then tutilus's docs site and UX work grafted on top as PRs — I am happy to do that grafting myself if @tutilus prefers to review rather than port.
 >
-> **What I would keep from the others regardless of the base:** tutilus's documentation split and syntax-colouring work, and kit1211's response-tab reuse and `{{$faker}}` from rest-client-plus (#1434) if he is willing to contribute them.
->
-> On the name: I have no attachment to "HttpKeeper". If the org publishes as something else, we redirect our listing to it and keep maintaining. The only thing I would not do is strand the people who already installed either fork: whichever ID wins, the others should publish one last version that points to it.
+> Naming and publishing identity deserve their own issue; I have no attachment to "HttpKeeper", only to not stranding anyone who already installed any of the three.
