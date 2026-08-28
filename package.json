@@ -785,7 +785,6 @@
         "test:vsix": "node scripts/probar-vsix.mjs",
         "demo": "node scripts/demo/lanzar.mjs && node scripts/demo/montar.mjs",
         "build": "webpack --mode production",
-        "vigia": "node scripts/vigia-hilos.mjs",
         "test:mcp": "node scripts/probar-mcp.mjs",
         "preparar-npm": "node scripts/preparar-npm.mjs"
     },

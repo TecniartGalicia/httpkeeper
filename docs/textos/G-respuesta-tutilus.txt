@@ -1,7 +1,0 @@
-Thank you both — that was quick. Then let's make it concrete, in the org repo rather than in this thread:
-
-1. **Base.** With your go, @marcellourbani, I push HttpKeeper's `master` to `vscode-restclient/vscode-restclient` as `main`, history intact (no squash, no rewrite). One command, reversible, and from then on all work happens there. I will not touch the org repo before you say yes.
-2. **Porting rest-client-next.** I take it, @tutilus — thank you for the trust. I will open an issue there listing what yours has that we lack (the docs site, the syntax-colouring work, the UX fixes, `@set` from #1422, and anything you point me to) and port it in small PRs you can review at your pace; winter is fine for the review, no need to port anything yourself.
-3. **Name and publishing.** Agreed that the name should honour the legacy. Two constraints worth knowing before that discussion: the Marketplace ID `humao.rest-client` belongs to Huachao and cannot be reused, so the org needs its own publisher; and the Marketplace rejects names it considers too close to an existing extension, so "REST Client" as a display name under a new publisher may or may not pass — I can test it with a private listing before we decide. I will open a second issue for this so it gets its own thread. Until the org publishes, `argalla.httpkeeper` keeps shipping the same code from the org repo; when the org listing exists, ours points people to it.
-
-If that plan is fine, say so and I start with (1) and the two issues today.
