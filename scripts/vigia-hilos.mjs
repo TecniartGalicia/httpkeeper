@@ -19,6 +19,10 @@ const CARPETA = path.join(RAIZ, 'vigia');
 const ESTADO = path.join(CARPETA, 'estado.json');
 const NOSOTROS = 'TecniartGalicia';
 const REPO_PROPIO = 'TecniartGalicia/httpkeeper';
+// Repositorios cuyas incidencias nuevas y comentarios interesan enteros (no
+// solo hilos concretos): el nuestro y el de la organización comunitaria.
+const REPOS_VIGILADOS = [REPO_PROPIO, 'vscode-restclient/vscode-restclient'];
+const ORGANIZACION = 'vscode-restclient';
 const EXTENSION = 'argalla.httpkeeper';
 const AHORA = new Date();
 
@@ -100,28 +104,55 @@ for (const hilo of hilos) {
     }
 }
 
-// --- 2. Nuestro repositorio: incidencias y comentarios de otros --------------
-try {
-    const propias = await gh(`/repos/${REPO_PROPIO}/issues?state=all&sort=updated&direction=desc&per_page=50`);
-    for (const i of propias) {
-        const esPR = !!i.pull_request;
-        const clave = `${REPO_PROPIO}#${i.number}`;
-        if (!estado.incidencias?.[clave] && !estado.primeraVez && i.user?.login !== NOSOTROS) {
-            novedades.push(`${esPR ? 'PR' : 'Incidencia'} nueva en nuestro repo: **#${i.number}** «${corto(i.title, 90)}» de ${i.user.login}\n  ${i.html_url}`);
-        }
-        nuevoEstado.incidencias[clave] = { estado: i.state, comentarios: i.comments };
-        if (new Date(i.updated_at) > desde && i.comments > 0) {
-            const cs = await gh(`/repos/${REPO_PROPIO}/issues/${i.number}/comments?per_page=100`);
-            for (const c of cs.filter((c) => c.user?.login !== NOSOTROS && new Date(c.created_at) > desde)) {
-                novedades.push(`Nuestro repo #${i.number}: comentario de **${c.user.login}** (${fecha(c.created_at)}): «${corto(c.body)}»\n  ${c.html_url}`);
+// --- 2. Repositorios enteros: incidencias y comentarios de otros -------------
+for (const repoVigilado of REPOS_VIGILADOS) {
+    try {
+        const lista = await gh(`/repos/${repoVigilado}/issues?state=all&sort=updated&direction=desc&per_page=50`);
+        for (const i of lista) {
+            const esPR = !!i.pull_request;
+            const clave = `${repoVigilado}#${i.number}`;
+            if (!estado.incidencias?.[clave] && !estado.primeraVez && i.user?.login !== NOSOTROS) {
+                novedades.push(`${esPR ? 'PR' : 'Incidencia'} nueva en ${repoVigilado}: **#${i.number}** «${corto(i.title, 90)}» de ${i.user.login}
+  ${i.html_url}`);
+            }
+            nuevoEstado.incidencias[clave] = { estado: i.state, comentarios: i.comments };
+            if (new Date(i.updated_at) > desde && i.comments > 0) {
+                const cs = await gh(`/repos/${repoVigilado}/issues/${i.number}/comments?per_page=100`);
+                for (const c of cs.filter((c) => c.user?.login !== NOSOTROS && new Date(c.created_at) > desde)) {
+                    novedades.push(`${repoVigilado}#${i.number}: comentario de **${c.user.login}** (${fecha(c.created_at)}): «${corto(c.body)}»
+  ${c.html_url}`);
+                }
             }
         }
+        const repo = await gh(`/repos/${repoVigilado}`);
+        if (repoVigilado === REPO_PROPIO) {
+            nuevoEstado.cifras.estrellas = repo.stargazers_count;
+            nuevoEstado.cifras.forks = repo.forks_count;
+        } else {
+            // El repo de la organización: si nos dan permiso de escritura o cambia el último commit, es noticia.
+            const permiso = repo.permissions?.admin ? 'admin' : repo.permissions?.push ? 'escritura' : 'lectura';
+            if (estado.org?.permiso && estado.org.permiso !== permiso) novedades.push(`${repoVigilado}: nuestro permiso pasa de ${estado.org.permiso} a **${permiso}**`);
+            if (estado.org?.ultimoPush && estado.org.ultimoPush !== repo.pushed_at) novedades.push(`${repoVigilado}: hay commits nuevos (último ${fecha(repo.pushed_at)})
+  ${repo.html_url}/commits`);
+            nuevoEstado.org = { ...(nuevoEstado.org ?? {}), permiso, ultimoPush: repo.pushed_at };
+            resumen.push(`**${repoVigilado}** — permiso: ${permiso}; último commit ${fecha(repo.pushed_at)}`);
+        }
+    } catch (e) {
+        problemas.push(`${repoVigilado}: ${e.message}`);
     }
-    const repo = await gh(`/repos/${REPO_PROPIO}`);
-    nuevoEstado.cifras.estrellas = repo.stargazers_count;
-    nuevoEstado.cifras.forks = repo.forks_count;
+}
+
+// --- 2b. La organización: nuestro rol y quién está dentro --------------------
+try {
+    const pertenencia = await gh(`/user/memberships/orgs/${ORGANIZACION}`);
+    const miembros = (await gh(`/orgs/${ORGANIZACION}/members?per_page=100`)).map((m) => m.login).sort();
+    if (estado.org?.rol && estado.org.rol !== pertenencia.role) novedades.push(`Organización ${ORGANIZACION}: nuestro rol pasa de ${estado.org.rol} a **${pertenencia.role}**`);
+    const nuevos = miembros.filter((m) => !(estado.org?.miembros ?? miembros).includes(m));
+    if (nuevos.length && !estado.primeraVez) novedades.push(`Organización ${ORGANIZACION}: miembros nuevos: **${nuevos.join(', ')}**`);
+    nuevoEstado.org = { ...(nuevoEstado.org ?? {}), rol: pertenencia.role, miembros };
+    resumen.push(`**Organización ${ORGANIZACION}** — rol: ${pertenencia.role}; miembros: ${miembros.join(', ')}`);
 } catch (e) {
-    problemas.push(`repo propio: ${e.message}`);
+    problemas.push(`organización: ${e.message}`);
 }
 
 // --- 3. Tiendas: cifras y reseñas -------------------------------------------
@@ -185,7 +216,7 @@ const informe = [
     resumen.map((r) => `- ${r}`).join('\n') || '- (ninguno en el registro)',
     '',
     problemas.length ? `## Fallos al consultar\n\n${problemas.map((p) => `- ${p}`).join('\n')}\n` : '',
-    `_Vigilados: ${hilos.join(', ')} · el repo ${REPO_PROPIO} · reseñas de ${EXTENSION}. Para vigilar otro hilo basta con que su URL esté en el registro de docs/MARKETING.md._`,
+    `_Vigilados: ${hilos.join(', ')} · los repos ${REPOS_VIGILADOS.join(' y ')} · la organización ${ORGANIZACION} · reseñas de ${EXTENSION}. Para vigilar otro hilo basta con que su URL esté en el registro de docs/MARKETING.md._`,
     '',
 ].join('\n');
 
