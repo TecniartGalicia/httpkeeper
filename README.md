@@ -105,6 +105,10 @@ Exit code 0 when every assertion passes, 1 when one fails, `--json` for machines
 
 ![The same file run from the integrated terminal](https://raw.githubusercontent.com/TecniartGalicia/httpkeeper/master/media/shots/04-runner.png)
 
+## Full reference
+
+Everything inherited from REST Client — request syntax, GraphQL, cURL, authentication (Basic, Digest, client certificates, Azure AD, AWS), variables, environments, code generation, settings — is documented verbatim in [docs/REFERENCE.md](docs/REFERENCE.md). Nothing was removed.
+
 ## Migrating from REST Client
 
 Nothing to do. The `.http` format is identical — JetBrains uses it too — and **your `rest-client.*` settings are still read**, so eight years of configuration keep working. Your own `httpkeeper.*` settings win when you set them. Your history, cookies and environments are read from the same `~/.rest-client` folder, so you keep them too.

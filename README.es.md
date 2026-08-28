@@ -105,6 +105,10 @@ Devuelve 0 si todas las comprobaciones pasan y 1 si falla alguna; `--json` para 
 
 ![El mismo fichero, ejecutado en la terminal integrada](https://raw.githubusercontent.com/TecniartGalicia/httpkeeper/master/media/shots/04-runner.png)
 
+## Referencia completa
+
+Todo lo heredado de REST Client —sintaxis de las peticiones, GraphQL, cURL, autenticación (Basic, Digest, certificados de cliente, Azure AD, AWS), variables, entornos, generación de código, ajustes— está documentado íntegro en [docs/REFERENCE.md](docs/REFERENCE.md) (en inglés, el texto original). No se quitó nada.
+
 ## Venir desde REST Client
 
 No hay que hacer nada. El formato `.http` es idéntico —lo usa hasta JetBrains— y **tus ajustes `rest-client.*` se siguen leyendo**, así que ocho años de configuración siguen funcionando. Los tuyos propios de `httpkeeper.*` mandan en cuanto los pongas. El historial, las cookies y los entornos se leen de la misma carpeta `~/.rest-client`, así que también te los llevas.
