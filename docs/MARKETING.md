@@ -228,3 +228,4 @@ Aviso: cuentas de Reddit nuevas caen en AutoModerator (nos pasó con r/ClaudeAI)
 | 2026-08-26 20:11 UTC | A · incidencia al autor (#1449) | https://github.com/Huachao/vscode-restclient/issues/1449 | publicada; sin respuesta aún |
 | 2026-08-26 20:17 UTC | C · comentario en #1434 (Cursor) | https://github.com/Huachao/vscode-restclient/issues/1434#issuecomment-5430612712 | publicado; sin respuesta aún |
 | 2026-08-28 05:33 UTC | E · respuesta a Marcello en #1394 (organización) | https://github.com/Huachao/vscode-restclient/issues/1394#issuecomment-5448849974 | publicada; invitación a la org `vscode-restclient` aceptada (miembro) |
+| 2026-08-28 07:10 UTC | F · comparativa de los tres forks en #1394 (cifras medidas) | https://github.com/Huachao/vscode-restclient/issues/1394#issuecomment-5449555176 | publicada; propone HttpKeeper de base + injertar docs/UX de tutilus |
