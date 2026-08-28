@@ -36,7 +36,7 @@ Y el hilo #1394 (donde ya estamos) merece una línea: «1.1.0 out: JetBrains for
 
 Marcello creó la organización y su repositorio; somos miembros y él prometió el rol de administrador. La comparativa de forks con cifras y la propuesta de adopción están publicadas en #1394 (28-08). **Los anuncios de la 1.1 quedan aplazados** hasta que la organización decida la base.
 
-El vigía corre **cada 30 minutos** (tarea de Windows `HttpKeeper-Vigia`) y te avisa con una notificación si alguien responde en #1394, si te hacen administrador, si entra tutilus, si abren una incidencia o suben commits al repositorio de la organización. Informe en el escritorio (`HttpKeeper-vigia.md`).
+El vigía corre **cada 30 minutos** (tarea de Windows `HttpKeeper-Vigia`) y te avisa con una notificación de Windows **y un WhatsApp a tu propio chat** (por la app de WhatsApp para Windows, `~/handsfree-browser/whatsapp-app-enviar.py`; número en `WHATSAPP_NUMERO` de `Documents\handsfree-secrets.txt`) si alguien responde en #1394, si te hacen administrador, si entra tutilus, si abren una incidencia o suben commits al repositorio de la organización. Informe en el escritorio (`HttpKeeper-vigia.md`).
 
 ## 4. Mirar la ficha con ojos de cliente
 

@@ -230,7 +230,8 @@ console.log(informe);
 // para Windows (UI Automation, sin depender del foco); si falla, WhatsApp Web
 // en el Chrome controlado. Falla en silencio: el informe y el aviso de
 // Windows siguen siendo la fuente de verdad.
-if (novedades.length && !process.argv.includes('--sin-whatsapp')) {
+if ((novedades.length || PROBAR_AVISO) && !process.argv.includes('--sin-whatsapp')) {
+    if (!novedades.length) novedades.push('Prueba del aviso: el vigía funciona y llega por WhatsApp.');
     const titulares = novedades.slice(0, 6).map((n) => '• ' + n.split('\n')[0].replace(/\*\*/g, '')).join('\n');
     const mensaje = `HttpKeeper · ${novedades.length} novedad${novedades.length === 1 ? '' : 'es'} (${dia} ${AHORA.toTimeString().slice(0, 5)})\n${titulares}${novedades.length > 6 ? '\n…' : ''}\nInforme: Desktop/HttpKeeper-vigia.md`;
     const carpeta = path.join(os.homedir(), 'handsfree-browser');
