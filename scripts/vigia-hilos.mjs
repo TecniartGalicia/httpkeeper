@@ -226,6 +226,19 @@ fs.writeFileSync(path.join(os.homedir(), 'Desktop', 'HttpKeeper-vigia.md'), info
 fs.writeFileSync(ESTADO, JSON.stringify(nuevoEstado, null, 2));
 console.log(informe);
 
+// WhatsApp a uno mismo, si hay número apuntado y WhatsApp Web vinculado en el
+// Chrome controlado (CDP 9222). Falla en silencio: el informe y el aviso de
+// Windows siguen siendo la fuente de verdad.
+if (novedades.length && !process.argv.includes('--sin-whatsapp')) {
+    const titulares = novedades.slice(0, 6).map((n) => '• ' + n.split('\n')[0].replace(/\*\*/g, '')).join('\n');
+    const mensaje = `HttpKeeper · ${novedades.length} novedad${novedades.length === 1 ? '' : 'es'} (${dia} ${AHORA.toTimeString().slice(0, 5)})\n${titulares}${novedades.length > 6 ? '\n…' : ''}\nInforme: Desktop/HttpKeeper-vigia.md`;
+    const script = path.join(os.homedir(), 'handsfree-browser', 'whatsapp-enviar.mjs');
+    if (fs.existsSync(script)) {
+        const r = spawnSync(process.execPath, [script], { input: mensaje, encoding: 'utf8', timeout: 90_000, cwd: path.dirname(script) });
+        if (r.status !== 0) { problemas.push(`whatsapp: ${(r.stderr || r.stdout || '').trim().split('\n').pop()}`); }
+    }
+}
+
 // Aviso en Windows solo si hay algo que leer.
 if ((novedades.length || PROBAR_AVISO) && process.platform === 'win32') {
     if (!novedades.length) novedades.push('Prueba del aviso: el vigía funciona.');
