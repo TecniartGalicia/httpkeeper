@@ -75,8 +75,7 @@ jobs:
           if npm view "httpkeeper-cli@$VER" version >/dev/null 2>&1; then
             echo "npm ya tiene $VER"
           else
-            printf '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
-' > "$RUNNER_TEMP/npmrc"
+            printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/npmrc"
             (cd npm && npm publish --access public --userconfig "$RUNNER_TEMP/npmrc")
             rm -f "$RUNNER_TEMP/npmrc"
           fi
