@@ -7,7 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
-- The extension is called **REST Client** again, and the README is Huachao Mao's original reference, verbatim, with a summary of what changed since 0.25.1 on top. The HttpKeeper README moved to `docs/HTTPKEEPER.md` (and `docs/HTTPKEEPER.es.md`). Development now happens in the [vscode-restclient organisation](https://github.com/vscode-restclient/vscode-restclient).
+- The extension is called **REST Client** again (`displayName` and `name`), and the README is Huachao Mao's original reference, with a summary of what changed since 0.25.1 on top and one addition: AWS Cognito, supported since 0.24 but never documented. The HttpKeeper README moved to `docs/HTTPKEEPER.md` (and `docs/HTTPKEEPER.es.md`). Development now happens in the [vscode-restclient organisation](https://github.com/vscode-restclient/vscode-restclient).
 
 ## [1.1.1] - 2026-08-27
 

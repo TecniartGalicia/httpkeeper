@@ -2,7 +2,7 @@
 
 **Send HTTP requests from a `.http` file and read the response in Visual Studio Code.** No account, no cloud, no paywall, no telemetry.
 
-REST Client was created by [Huachao Mao](https://github.com/Huachao) and reached 7.5 million installs. Its last release was 0.25.1 in June 2022. Since August 2026 it is maintained here, by the [vscode-restclient organisation](https://github.com/vscode-restclient), on the same code and the same `.http` format, under the same MIT license. Everything below still works exactly as Huachao documented it; this README is his, kept verbatim, with a short summary of what changed first.
+REST Client was created by [Huachao Mao](https://github.com/Huachao) and reached 7.5 million installs. Its last release was 0.25.1 in June 2022. Since August 2026 it is maintained here, by the [vscode-restclient organisation](https://github.com/vscode-restclient), on the same code and the same `.http` format, under the same MIT license. Everything below still works exactly as Huachao documented it; this README is his, kept as it was, with a short summary of what changed first. The only edit to his text is the *AWS Cognito* entry: the extension has supported it for years, but the original README never mentioned it.
 
 ## What is new since 0.25.1
 
@@ -38,6 +38,7 @@ Your `rest-client.*` settings, history, cookies and environments keep working un
     - Azure Active Directory
     - Microsoft Identity Platform
     - AWS Signature v4
+    - AWS Cognito
 * Environments and custom/system variables support
     - Use variables in any place of request(_URL_, _Headers_, _Body_)
     - Support __environment__, __file__, __request__ and __prompt__ custom variables
@@ -394,6 +395,18 @@ AWS Signature version 4 authenticates requests to AWS services. To use it you ne
 GET https://httpbin.org/aws-auth HTTP/1.1
 Authorization: AWS <accessId> <accessKey> [token:<sessionToken>] [region:<regionName>] [service:<serviceName>]
 ```
+
+### AWS Cognito
+
+> Cognito has been supported since 0.24 but was never listed in this README. It is here now because it still works: the only thing that changed is that the request no longer pulls in the whole AWS SDK ([details](docs/HTTPKEEPER.md)).
+
+Authenticate against an Amazon Cognito user pool and send the resulting access token as the `Authorization` header:
+
+```http
+Authorization: Cognito {{username}} {{password}} {{region}} {{userPoolId}} {{clientId}}
+```
+
+The flow used is `USER_PASSWORD_AUTH`, so the app client must have it enabled.
 
 ## Generate Code Snippet
 ![Generate Code Snippet](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/code-snippet.gif)

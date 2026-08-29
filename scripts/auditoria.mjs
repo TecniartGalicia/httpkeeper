@@ -22,7 +22,7 @@ const leer = (f) => fs.readFileSync(f, 'utf8');
 
 seccion('identidad');
 const pkg = JSON.parse(leer('package.json'));
-ok('el nombre y el editor son los propios', pkg.name === 'httpkeeper' && pkg.publisher === 'argalla');
+ok('el nombre es el del original y el editor el nuestro', pkg.name === 'rest-client' && pkg.publisher === 'argalla');
 ok('se publica gratis', pkg.pricing === 'Free');
 // `onLanguage:markdown` está por los bloques ```http dentro de markdown, que es
 // una función real. Lo inaceptable sería `*`: activarse siempre, pase lo que pase.
@@ -119,11 +119,14 @@ ok('todo comando invocado por enlace existe', huerfanos.length === 0, huerfanos.
 // Solo se miran las cadenas con guion: los identificadores internos
 // (RestClientSettings y compania) se dejan como estan para que los parches del
 // proyecto original sigan aplicando sin ruido.
-// Los dos sitios donde `rest-client` sigue siendo lo correcto: los ajustes que
-// se heredan y la carpeta de datos que se comparte a proposito.
-const restosPermitidos = ['src/utils/configuracionHeredada.ts', 'src/utils/userDataManager.ts'];
-const restos = fuentes.filter((f) => !restosPermitidos.includes(f) && /rest-client|vscode-restclient/.test(leer(f)));
-ok('sin restos del nombre viejo fuera de donde toca', restos.length === 0, restos.join(', '));
+// El identificador que el código anuncia tiene que ser el que publica el
+// manifiesto: si no, `extensions.getExtension(...)` devuelve undefined y la
+// extensión no se encuentra a sí misma (pasó al renombrar el fork).
+const idDeclarado = /ExtensionId: string = '([^']+)'/.exec(leer('src/common/constants.ts'))?.[1];
+ok('el id del código es publisher.name del manifiesto', idDeclarado === `${pkg.publisher}.${pkg.name}`, `${idDeclarado} vs ${pkg.publisher}.${pkg.name}`);
+// La sección de ajustes del original se sigue leyendo: es lo que hace que ocho
+// años de configuración ajena funcionen sin tocar nada.
+ok('se conserva la herencia de ajustes', leer('src/utils/configuracionHeredada.ts').includes("'rest-client'"));
 
 seccion('nivel 2: formato JetBrains, streaming, agentes y runner');
 const cliFuente = leer('src/cli/index.ts');
