@@ -1,5 +1,5 @@
 {
-    "ext.description": "Send HTTP requests from a .http file and read the response in the editor. No account, no cloud, no paywall. A maintained fork of REST Client.",
+    "ext.description": "REST Client, maintained: send HTTP requests from a .http file and read the response in the editor. No account, no cloud, no paywall, no telemetry. Same format and settings as always, plus tests, assertions, a terminal runner, the JetBrains format, streaming and tools for agents.",
     "cmd.request": "Send Request",
     "cmd.rerun-last-request": "Rerun Last Request",
     "cmd.cancel-request": "Cancel Request",

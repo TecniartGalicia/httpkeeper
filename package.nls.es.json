@@ -1,5 +1,5 @@
 {
-    "ext.description": "Envía peticiones HTTP desde un fichero .http y lee la respuesta en el editor. Sin cuenta, sin nube y sin muro de pago. Un fork mantenido de REST Client.",
+    "ext.description": "REST Client, mantenido: envía peticiones HTTP desde un fichero .http y lee la respuesta en el editor. Sin cuenta, sin nube, sin muro de pago, sin telemetría. El mismo formato y los mismos ajustes de siempre, más pruebas, comprobaciones, ejecutor de terminal, formato JetBrains, streaming y herramientas para agentes.",
     "cmd.request": "Enviar la petición",
     "cmd.rerun-last-request": "Repetir la última petición",
     "cmd.cancel-request": "Cancelar la petición",
