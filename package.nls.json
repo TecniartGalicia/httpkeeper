@@ -1,5 +1,5 @@
 {
-    "ext.description": "Send HTTP requests from a .http file and read the response in the editor. No account, no cloud, no paywall. A maintained fork of REST Client.",
+    "ext.description": "Continued as REST Client CE (vscode-restclient.restclient): install that one. Send HTTP requests from a .http file and read the response in the editor.",
     "cmd.request": "Send Request",
     "cmd.rerun-last-request": "Rerun Last Request",
     "cmd.cancel-request": "Cancel Request",

@@ -156,7 +156,7 @@ const l10n = correr('node scripts/comprobar-l10n.mjs');
 ok('ingles y castellano sin huecos', l10n.codigo === 0, /=+ (\d+) fallos/.exec(l10n.salida)?.[1] + ' fallos');
 
 seccion('el paquete lleva lo que promete y nada mas');
-const empaquetados = correr('npx vsce ls --no-dependencies').salida.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+const empaquetados = correr('npx --yes @vscode/vsce@4.0.0 ls --no-dependencies').salida.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
 const enPaquete = (f) => empaquetados.includes(f);
 ok('el bundle del runner viaja en el paquete', enPaquete('dist/cli.js'));
 ok('el binario declarado es el que viaja', enPaquete(pkg.bin.httpkeeper.replace('./', '')));

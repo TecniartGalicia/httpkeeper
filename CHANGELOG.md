@@ -3,6 +3,14 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-10-16
+
+### Changed
+
+- **Last release under this name.** HttpKeeper continues as **REST Client CE** (`vscode-restclient.restclient`, Marketplace and Open VSX), maintained with the original project's community at vscode-restclient/vscode-restclient. The README and the listing say so; nothing else changes. The npm package `httpkeeper-cli` is deprecated in favour of `@vscode-restclient/cli`.
+
+[1.1.2]: https://github.com/TecniartGalicia/httpkeeper/releases/tag/v1.1.2
+
 ## [1.1.1] - 2026-08-27
 
 ### Changed

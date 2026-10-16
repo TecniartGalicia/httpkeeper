@@ -1,5 +1,12 @@
 # HttpKeeper
 
+> **HttpKeeper continúa como [REST Client CE](https://marketplace.visualstudio.com/items?itemName=vscode-restclient.restclient)**
+> (`vscode-restclient.restclient`, también en [Open VSX](https://open-vsx.org/extension/vscode-restclient/restclient)). La misma
+> extensión, con casa y nombre nuevos, mantenida con la comunidad del proyecto original en
+> [vscode-restclient/vscode-restclient](https://github.com/vscode-restclient/vscode-restclient). **Instala esa**: esta ficha no
+> recibirá más actualizaciones. Tus ficheros `.http` y tus ajustes funcionan igual. El runner es `npx @vscode-restclient/cli`
+> (el paquete `httpkeeper-cli` está deprecado).
+
 **Envía peticiones HTTP desde un fichero `.http` y lee la respuesta en el editor.** Sin cuenta, sin nube, sin muro de pago, sin telemetría.
 
 Fork mantenido de [REST Client](https://github.com/Huachao/vscode-restclient), de **Huachao Mao** (MIT): 7,5 millones de instalaciones, 4,9 estrellas y sin una versión nueva desde junio de 2022. El mismo formato `.http`, los mismos ajustes, recogido y puesto al día.

@@ -44,7 +44,7 @@ async function main() {
 
     const vsix = path.join(os.tmpdir(), `httpkeeper-prueba-${process.pid}.vsix`);
     console.log('empaquetando...');
-    correr('npx', ['vsce', 'package', '--no-dependencies', '-o', ruta(vsix)], { cwd: RAIZ });
+    correr('npx', ['--yes', '@vscode/vsce@4.0.0', 'package', '--no-dependencies', '-o', ruta(vsix)], { cwd: RAIZ });
     console.log(`${(fs.statSync(vsix).size / 1024 / 1024).toFixed(2)} MB`);
 
     const ejecutable = await downloadAndUnzipVSCode();

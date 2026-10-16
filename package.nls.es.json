@@ -1,5 +1,5 @@
 {
-    "ext.description": "Envía peticiones HTTP desde un fichero .http y lee la respuesta en el editor. Sin cuenta, sin nube y sin muro de pago. Un fork mantenido de REST Client.",
+    "ext.description": "Continúa como REST Client CE (vscode-restclient.restclient): instala esa. Envía peticiones HTTP desde un fichero .http y lee la respuesta en el editor.",
     "cmd.request": "Enviar la petición",
     "cmd.rerun-last-request": "Repetir la última petición",
     "cmd.cancel-request": "Cancelar la petición",
