@@ -622,7 +622,7 @@ SOFTWARE.
 
 ------------------------------------------------------------------------------
 
-axios@1.19.0
+axios@1.20.0
 License: MIT
 Repository: https://github.com/axios/axios
 Author: Matt Zabriskie
@@ -2403,7 +2403,7 @@ IN THE SOFTWARE.
 
 ------------------------------------------------------------------------------
 
-http-cache-semantics@4.1.1
+http-cache-semantics@4.3.0
 License: BSD-2-Clause
 Repository: https://github.com/kornelski/http-cache-semantics
 Author: Kornel Lesiński
@@ -4180,7 +4180,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ------------------------------------------------------------------------------
 
-source-map-js@1.2.1
+source-map-js@1.2.2
 License: BSD-3-Clause
 Repository: https://github.com/7rulnik/source-map-js
 Author: Valentin 7rulnik Semirulnik
